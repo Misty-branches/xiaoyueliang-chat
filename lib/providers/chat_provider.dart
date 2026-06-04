@@ -251,9 +251,9 @@ class ChatProvider extends ChangeNotifier {
     // 同步用户消息到云端
     _syncToCloud();
 
-    // 调用流式 API
+    // 调用 API
     try {
-      await for (final delta in _apiService.chatCompletion(
+      final response = await _apiService.chatCompletion(
         messages: _currentSession!.messages
             .where((m) => m.id != assistantMsg.id)
             .toList(),
@@ -263,21 +263,9 @@ class ChatProvider extends ChangeNotifier {
         systemPrompt: _settings.systemPrompt,
         bookTitle: _referencedBook?.title,
         bookContent: _referencedBook?.content,
-      )) {
-        _streamingContent += delta;
-        assistantMsg.content = _streamingContent;
-
-        // 每收到一定量的内容，同步到云端
-        if (_streamingContent.length % 50 < 10 && _cloudConnected) {
-          _dataService.updateMessage(
-            _currentSession!.id,
-            assistantMsg.id,
-            _streamingContent,
-          );
-        }
-
-        notifyListeners();
-      }
+      );
+      assistantMsg.content = response;
+      notifyListeners();
     } catch (e) {
       assistantMsg.content = '请求失败: $e';
     }
@@ -340,7 +328,7 @@ class ChatProvider extends ChangeNotifier {
           '---章节内容结束---\n\n'
           '用户刚才读了这一章，现在提出了关于本章内容的问题。请根据以上章节内容回答。';
 
-      await for (final delta in _apiService.chatCompletion(
+      final response = await _apiService.chatCompletion(
         messages: _currentSession!.messages
             .where((m) => m.id != assistantMsg.id)
             .toList(),
@@ -348,11 +336,9 @@ class ChatProvider extends ChangeNotifier {
         temperature: _settings.temperature,
         maxTokens: _settings.maxTokens,
         systemPrompt: enhancedSystemPrompt,
-      )) {
-        _streamingContent += delta;
-        assistantMsg.content = _streamingContent;
-        notifyListeners();
-      }
+      );
+      assistantMsg.content = response;
+      notifyListeners();
     } catch (e) {
       assistantMsg.content = '请求失败: $e';
     }
