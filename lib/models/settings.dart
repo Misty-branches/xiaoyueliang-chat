@@ -11,7 +11,7 @@ class AppSettings {
   const AppSettings({
     this.apiUrl = 'http://82.156.84.184:8642',
     this.apiKey = '',
-    this.model = 'deepseek-v4-flash',
+    this.model = 'hermes-agent',
     this.temperature = 0.7,
     this.maxTokens = 4096,
     this.darkMode = false,
@@ -55,7 +55,7 @@ class AppSettings {
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
         apiUrl: json['apiUrl'] as String? ?? 'http://82.156.84.184:8642',
         apiKey: json['apiKey'] as String? ?? '',
-        model: json['model'] as String? ?? 'deepseek-v4-flash',
+        model: json['model'] as String? ?? 'hermes-agent',
         temperature: (json['temperature'] as num?)?.toDouble() ?? 0.7,
         maxTokens: json['maxTokens'] as int? ?? 4096,
         darkMode: json['darkMode'] as bool? ?? false,
