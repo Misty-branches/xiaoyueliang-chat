@@ -16,9 +16,12 @@ class ApiService {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'text/event-stream',
-            if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
           },
-        ));
+        )) {
+    if (apiKey.isNotEmpty) {
+      _dio.options.headers['Authorization'] = 'Bearer $apiKey';
+    }
+  }
 
   void updateBaseUrl(String url) {
     _dio.options.baseUrl = url;
