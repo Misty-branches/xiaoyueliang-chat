@@ -5,20 +5,32 @@ import '../models/message.dart';
 
 class ApiService {
   final Dio _dio;
+  String _apiKey;
 
-  ApiService({required String baseUrl, Duration timeout = const Duration(seconds: 60)})
-      : _dio = Dio(BaseOptions(
+  ApiService({required String baseUrl, String apiKey = '', Duration timeout = const Duration(seconds: 60)})
+      : _apiKey = apiKey,
+        _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: timeout,
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'text/event-stream',
+            if (apiKey.isNotEmpty) 'Authorization': 'Bearer $apiKey',
           },
         ));
 
   void updateBaseUrl(String url) {
     _dio.options.baseUrl = url;
+  }
+
+  void updateApiKey(String apiKey) {
+    _apiKey = apiKey;
+    if (apiKey.isNotEmpty) {
+      _dio.options.headers['Authorization'] = 'Bearer $apiKey';
+    } else {
+      _dio.options.headers.remove('Authorization');
+    }
   }
 
   /// Send a chat completion request with streaming support.

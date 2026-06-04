@@ -1,5 +1,6 @@
 class AppSettings {
   final String apiUrl;
+  final String apiKey;
   final String model;
   final double temperature;
   final int maxTokens;
@@ -9,6 +10,7 @@ class AppSettings {
 
   const AppSettings({
     this.apiUrl = 'http://82.156.84.184:8642',
+    this.apiKey = '',
     this.model = 'deepseek-v4-flash',
     this.temperature = 0.7,
     this.maxTokens = 4096,
@@ -19,6 +21,7 @@ class AppSettings {
 
   AppSettings copyWith({
     String? apiUrl,
+    String? apiKey,
     String? model,
     double? temperature,
     int? maxTokens,
@@ -28,6 +31,7 @@ class AppSettings {
   }) {
     return AppSettings(
       apiUrl: apiUrl ?? this.apiUrl,
+      apiKey: apiKey ?? this.apiKey,
       model: model ?? this.model,
       temperature: temperature ?? this.temperature,
       maxTokens: maxTokens ?? this.maxTokens,
@@ -39,6 +43,7 @@ class AppSettings {
 
   Map<String, dynamic> toJson() => {
         'apiUrl': apiUrl,
+        'apiKey': apiKey,
         'model': model,
         'temperature': temperature,
         'maxTokens': maxTokens,
@@ -49,6 +54,7 @@ class AppSettings {
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
         apiUrl: json['apiUrl'] as String? ?? 'http://82.156.84.184:8642',
+        apiKey: json['apiKey'] as String? ?? '',
         model: json['model'] as String? ?? 'deepseek-v4-flash',
         temperature: (json['temperature'] as num?)?.toDouble() ?? 0.7,
         maxTokens: json['maxTokens'] as int? ?? 4096,

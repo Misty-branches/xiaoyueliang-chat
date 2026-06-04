@@ -13,6 +13,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _apiUrlController;
+  late TextEditingController _apiKeyController;
   late TextEditingController _modelController;
   late TextEditingController _systemPromptController;
   late TextEditingController _dataServiceUrlController;
@@ -24,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     final settings = context.read<ChatProvider>().settings;
     _apiUrlController = TextEditingController(text: settings.apiUrl);
+    _apiKeyController = TextEditingController(text: settings.apiKey);
     _modelController = TextEditingController(text: settings.model);
     _systemPromptController = TextEditingController(text: settings.systemPrompt);
     _dataServiceUrlController = TextEditingController(text: settings.dataServiceUrl);
@@ -34,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _apiUrlController.dispose();
+    _apiKeyController.dispose();
     _modelController.dispose();
     _systemPromptController.dispose();
     _dataServiceUrlController.dispose();
@@ -44,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final provider = context.read<ChatProvider>();
     provider.updateSettings(AppSettings(
       apiUrl: _apiUrlController.text.trim(),
+      apiKey: _apiKeyController.text.trim(),
       model: _modelController.text.trim(),
       temperature: _temperature,
       maxTokens: _maxTokens,
@@ -92,6 +96,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 label: 'API 服务器地址',
                 hint: 'http://82.156.84.184:8642',
                 icon: Icons.link_rounded,
+                isDark: isDark,
+              ),
+              const SizedBox(height: 12),
+              _buildTextField(
+                controller: _apiKeyController,
+                label: 'API Key',
+                hint: 'sk-...',
+                icon: Icons.vpn_key_rounded,
                 isDark: isDark,
               ),
               const SizedBox(height: 12),

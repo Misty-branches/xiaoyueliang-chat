@@ -33,7 +33,7 @@ class ChatProvider extends ChangeNotifier {
   bool get cloudConnected => _cloudConnected;
 
   ChatProvider() {
-    _apiService = ApiService(baseUrl: _settings.apiUrl);
+    _apiService = ApiService(baseUrl: _settings.apiUrl, apiKey: _settings.apiKey);
     _dataService = DataService(baseUrl: _settings.dataServiceUrl);
     _loadData();
   }
@@ -191,6 +191,7 @@ class ChatProvider extends ChangeNotifier {
   Future<void> updateSettings(AppSettings newSettings) async {
     _settings = newSettings;
     _apiService.updateBaseUrl(newSettings.apiUrl);
+    _apiService.updateApiKey(newSettings.apiKey);
     _dataService.updateBaseUrl(newSettings.dataServiceUrl);
     await _saveData();
     notifyListeners();
