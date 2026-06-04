@@ -239,7 +239,8 @@ class _SettingsPageState extends State<SettingsPage> {
   void _testConnection(BuildContext context, bool isDark) async {
     // Simple connectivity test
     try {
-      final uri = Uri.parse(_apiUrlController.text.trim());
+      final baseUrl = _apiUrlController.text.trim();
+      final uri = Uri.parse('$baseUrl/health');
       final httpClient = HttpClient();
       final request = await httpClient.getUrl(uri);
       final response = await request.close();
