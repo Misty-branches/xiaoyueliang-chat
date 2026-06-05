@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/message.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
+  final VoidCallback? onCopy;
+  final VoidCallback? onDelete;
 
-  const MessageBubble({super.key, required this.message});
+  const MessageBubble({
+    super.key,
+    required this.message,
+    this.onCopy,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,131 +26,181 @@ class MessageBubble extends StatelessWidget {
       return _buildSystemMessage(isDark);
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 左侧：遐的头像（只有遐的消息显示）
-          if (!isUser)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: isDark
-                    ? Colors.blueGrey.shade700
-                    : Colors.blue.shade50,
-                child: Text(
-                  '遐',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
+    // 长按菜单
+    return GestureDetector(
+      onLongPress: () => _showMessageMenu(context, isDark),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 左侧：遐的头像（只有遐的消息显示）
+            if (!isUser)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: isDark
+                      ? Colors.blueGrey.shade700
+                      : Colors.blue.shade50,
+                  child: Text(
+                    '遐',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
+                    ),
                   ),
                 ),
               ),
-            ),
-          if (!isUser) const SizedBox(width: 8),
-          // 气泡：占满剩余可用空间
-          Expanded(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.82,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: isUser
-                    ? (isDark ? Colors.blue.shade700 : Colors.blue.shade500)
-                    : (isDark ? Colors.grey.shade800 : Colors.grey.shade100),
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isUser ? 16 : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : 16),
+            if (!isUser) const SizedBox(width: 8),
+            // 气泡：占满剩余可用空间
+            Expanded(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.82,
                 ),
-              ),
-              child: isUser
-                  ? Text(
-                      message.content,
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
-                    )
-                  : MarkdownBody(
-                      data: message.isStreaming
-                          ? '${message.content}▌'
-                          : message.content,
-                      styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
-                          fontSize: 15,
-                          height: 1.5,
-                        ),
-                        code: TextStyle(
-                          backgroundColor: isDark
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade200,
-                          fontSize: 13,
-                        ),
-                        codeblockDecoration: BoxDecoration(
-                          color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        h1: TextStyle(
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        h2: TextStyle(
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        h3: TextStyle(
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        a: TextStyle(color: isDark ? Colors.lightBlue.shade300 : Colors.blue),
-                        blockquoteDecoration: BoxDecoration(
-                          border: Border(
-                            left: BorderSide(
-                              color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
-                              width: 3,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isUser
+                      ? (isDark ? Colors.blue.shade700 : Colors.blue.shade500)
+                      : (isDark ? Colors.grey.shade800 : Colors.grey.shade100),
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    topRight: const Radius.circular(16),
+                    bottomLeft: Radius.circular(isUser ? 16 : 4),
+                    bottomRight: Radius.circular(isUser ? 4 : 16),
+                  ),
+                ),
+                child: isUser
+                    ? Text(
+                        message.content,
+                        style: const TextStyle(color: Colors.white, fontSize: 15),
+                      )
+                    : MarkdownBody(
+                        data: message.isStreaming
+                            ? '${message.content}▌'
+                            : message.content,
+                        styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                            fontSize: 15,
+                            height: 1.5,
+                          ),
+                          code: TextStyle(
+                            backgroundColor: isDark
+                                ? Colors.grey.shade700
+                                : Colors.grey.shade200,
+                            fontSize: 13,
+                          ),
+                          codeblockDecoration: BoxDecoration(
+                            color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          h1: TextStyle(
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          h2: TextStyle(
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          h3: TextStyle(
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          a: TextStyle(color: isDark ? Colors.lightBlue.shade300 : Colors.blue),
+                          blockquoteDecoration: BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                                width: 3,
+                              ),
                             ),
                           ),
-                        ),
-                        listBullet: TextStyle(
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
-                        ),
-                        tableBorder: TableBorder.all(
-                          color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
-                        ),
-                        tableHead: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.grey.shade200 : Colors.black87,
+                          listBullet: TextStyle(
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                          ),
+                          tableBorder: TableBorder.all(
+                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                          ),
+                          tableHead: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                          ),
                         ),
                       ),
-                    ),
+              ),
             ),
-          ),
-          // 右侧：小满的头像（只有小满的消息显示）
-          if (isUser)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
-                child: Text(
-                  '满',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+            // 右侧：小满的头像（只有小满的消息显示）
+            if (isUser)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
+                  child: Text(
+                    '满',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+                    ),
                   ),
                 ),
               ),
-            ),
-          if (isUser) const SizedBox(width: 8),
-        ],
+            if (isUser) const SizedBox(width: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 长按消息弹出操作菜单
+  void _showMessageMenu(BuildContext context, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.copy_rounded, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                title: Text('复制', style: TextStyle(color: isDark ? Colors.grey.shade200 : Colors.black87)),
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: message.content));
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('已复制'),
+                      duration: const Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade700,
+                    ),
+                  );
+                },
+              ),
+              if (onDelete != null)
+                ListTile(
+                  leading: Icon(Icons.delete_outline_rounded, color: Colors.red.shade400),
+                  title: Text('删除', style: TextStyle(color: Colors.red.shade400)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onDelete?.call();
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

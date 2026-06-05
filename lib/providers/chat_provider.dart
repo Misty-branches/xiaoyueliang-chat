@@ -182,6 +182,14 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 删除当前会话中的某条消息
+  void deleteMessage(int index) {
+    if (_currentSession == null || index < 0 || index >= _currentSession!.messages.length) return;
+    _currentSession!.messages.removeAt(index);
+    _saveData();
+    notifyListeners();
+  }
+
   Future<void> newSession() async {
     if (_isStreaming) return;
     _createNewSession();

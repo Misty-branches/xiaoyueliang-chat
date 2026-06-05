@@ -235,7 +235,10 @@ class _ChatPageState extends State<ChatPage> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     itemCount: session.messages.length,
                     itemBuilder: (context, index) {
-                      return MessageBubble(message: session.messages[index]);
+                      return MessageBubble(
+                        message: session.messages[index],
+                        onDelete: () => chatProvider.deleteMessage(index),
+                      );
                     },
                   ),
           ),
