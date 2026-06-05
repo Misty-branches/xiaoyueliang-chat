@@ -23,28 +23,31 @@ class MessageBubble extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isUser) const Spacer(),
+          // 左侧：遐的头像（只有遐的消息显示）
           if (!isUser)
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isDark
-                  ? Colors.blueGrey.shade700
-                  : Colors.blue.shade50,
-              child: Text(
-                '遐',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: isDark
+                    ? Colors.blueGrey.shade700
+                    : Colors.blue.shade50,
+                child: Text(
+                  '遐',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
+                  ),
                 ),
               ),
             ),
-          const SizedBox(width: 8),
-          Flexible(
+          if (!isUser) const SizedBox(width: 8),
+          // 气泡：占满剩余可用空间
+          Expanded(
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * (isUser ? 0.85 : 0.82),
-                minWidth: isUser ? MediaQuery.of(context).size.width * 0.25 : 0,
+                maxWidth: MediaQuery.of(context).size.width * 0.82,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
@@ -121,20 +124,24 @@ class MessageBubble extends StatelessWidget {
                     ),
             ),
           ),
-          if (!isUser) const Spacer(),
+          // 右侧：小满的头像（只有小满的消息显示）
           if (isUser)
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
-              child: Text(
-                '满',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
+                child: Text(
+                  '满',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+                  ),
                 ),
               ),
             ),
+          if (isUser) const SizedBox(width: 8),
         ],
       ),
     );
