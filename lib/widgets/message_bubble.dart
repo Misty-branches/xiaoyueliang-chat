@@ -348,7 +348,7 @@ class MessageBubble extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 4),
-              // 时间戳+模型信息
+              // 时间戳信息
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
@@ -357,13 +357,6 @@ class MessageBubble extends StatelessWidget {
                     fontSize: 12,
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
                   ),
-                ),
-              ),
-              Text(
-                'deepseek-v4-flash',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade500,
                 ),
               ),
             ],
