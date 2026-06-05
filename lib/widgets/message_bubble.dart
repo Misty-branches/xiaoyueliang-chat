@@ -31,53 +31,88 @@ class MessageBubble extends StatelessWidget {
       onLongPress: () => _showMessageMenu(context, isDark),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 左侧：遐的头像（只有遐的消息显示）
-            if (!isUser)
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: isDark
-                      ? Colors.blueGrey.shade700
-                      : Colors.blue.shade50,
-                  child: Text(
-                    '遐',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-              ),
-            if (!isUser) const SizedBox(width: 8),
-            // 气泡：占满剩余可用空间
-            Expanded(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.82,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isUser
-                      ? (isDark ? Colors.blue.shade700 : Colors.blue.shade500)
-                      : (isDark ? Colors.grey.shade800 : Colors.grey.shade100),
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(16),
-                    topRight: const Radius.circular(16),
-                    bottomLeft: Radius.circular(isUser ? 16 : 4),
-                    bottomRight: Radius.circular(isUser ? 4 : 16),
-                  ),
-                ),
-                child: isUser
-                    ? Text(
+        child: isUser
+            // ── 用户消息：右对齐，气泡自适应内容宽度 ──
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.82,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.blue.shade700 : Colors.blue.shade500,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(4),
+                        ),
+                      ),
+                      child: Text(
                         message.content,
                         style: const TextStyle(color: Colors.white, fontSize: 15),
-                      )
-                    : MarkdownBody(
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
+                      child: Text(
+                        '满',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            // ── 遐的消息：左对齐，头像+气泡撑满 ──
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor:
+                          isDark ? Colors.blueGrey.shade700 : Colors.blue.shade50,
+                      child: Text(
+                        '遐',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.blueGrey.shade200 : Colors.blue.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.82,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                          bottomLeft: Radius.circular(4),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: MarkdownBody(
                         data: message.isStreaming
                             ? '${message.content}▌'
                             : message.content,
@@ -132,29 +167,12 @@ class MessageBubble extends StatelessWidget {
                             color: isDark ? Colors.grey.shade200 : Colors.black87,
                           ),
                         ),
+                        ),
                       ),
-              ),
-            ),
-            // 右侧：小满的头像（只有小满的消息显示）
-            if (isUser)
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
-                  child: Text(
-                    '满',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
                     ),
-                  ),
+                  ],
                 ),
               ),
-            if (isUser) const SizedBox(width: 8),
-          ],
-        ),
       ),
     );
   }
