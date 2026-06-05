@@ -238,6 +238,26 @@ class _ChatPageState extends State<ChatPage> {
                       return MessageBubble(
                         message: session.messages[index],
                         onDelete: () => chatProvider.deleteMessage(index),
+                        onRegenerate: () {
+                          if (session.messages.length > index + 1) {
+                            // 删除遐的回复，重发用户上一条消息
+                            final userMsg = session.messages[index - 1];
+                            chatProvider.deleteMessage(index + 1);
+                            chatProvider.sendMessage(userMsg.content);
+                          }
+                        },
+                        onRead: () {
+                          // 朗读 —— 暂时留空，以后加 TTS
+                        },
+                        onEdit: () {
+                          // 编辑 —— 暂时留空
+                        },
+                        onFavorite: () {
+                          // 收藏 —— 暂时留空
+                        },
+                        onShare: () {
+                          // 分享 —— 暂时留空
+                        },
                       );
                     },
                   ),
