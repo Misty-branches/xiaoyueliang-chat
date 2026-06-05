@@ -219,11 +219,37 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 检查是否需要归档旧消息，必要时自动触发归档
+  Future<void> _checkAndArchive() async {
+    if (_currentSession == null || !_cloudConnected) return;
+
+    try {
+      final status = await _dataService.getArchiveStatus(_currentSession!.id);
+      if (status['needsArchive'] == true) {
+        await _dataService.archiveSession(_currentSession!.id);
+      }
+    } catch (_) {
+      // 归档失败不影响发消息，降级为全量发送
+    }
+  }
+
+  /// 手动触发归档（用户也可以主动调用）
+  Future<Map<String, dynamic>> manualArchive() async {
+    if (_currentSession == null) return {'archived': 0, 'message': '没有活动的对话'};
+    if (!_cloudConnected) return {'archived': 0, 'message': '云端未连接'};
+    return await _dataService.archiveSession(_currentSession!.id, force: true);
+  }
+
   Future<void> sendMessage(String content) async {
     if (content.trim().isEmpty || _isStreaming || _currentSession == null) return;
 
     _isLoading = true;
     notifyListeners();
+
+    // 检查是否需要归档旧消息（本地估算活跃消息大小）
+    if (_cloudConnected) {
+      await _checkAndArchive();
+    }
 
     // 添加用户消息
     final userMsg = Message(
@@ -257,14 +283,38 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
 
     // 同步用户消息到云端
-    _syncToCloud();
+    await _syncToCloud();
+
+    // 获取未归档的活跃消息用于 API 请求（合并本地+云端）
+    final List<Message> activeMessages;
+    if (_cloudConnected) {
+      // 从服务器获取已归档/未归档的消息ID
+      final serverActive = await _dataService.getActiveMessages(_currentSession!.id);
+      final serverIds = serverActive.map((m) => m.id).toSet();
+      
+      // 本地消息中：只在服务器活跃列表里的
+      activeMessages = _currentSession!.messages
+          .where((m) => m.id != assistantMsg.id)
+          .where((m) => serverIds.contains(m.id))
+          .toList();
+      
+      // 补上服务器有但本地没有的消息（比如从别的设备同步的）
+      for (final msg in serverActive) {
+        if (!activeMessages.any((m) => m.id == msg.id)) {
+          activeMessages.add(msg);
+        }
+      }
+    } else {
+      // 云端不可用时，用全部本地消息
+      activeMessages = _currentSession!.messages
+          .where((m) => m.id != assistantMsg.id)
+          .toList();
+    }
 
     // 调用 API
     try {
       final response = await _apiService.chatCompletion(
-        messages: _currentSession!.messages
-            .where((m) => m.id != assistantMsg.id)
-            .toList(),
+        messages: activeMessages,
         model: _settings.model,
         temperature: _settings.temperature,
         maxTokens: _settings.maxTokens,
@@ -303,6 +353,11 @@ class ChatProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    // 检查是否需要归档
+    if (_cloudConnected) {
+      await _checkAndArchive();
+    }
+
     // 添加用户消息
     final userMsg = Message(
       id: _uuid.v4(),
@@ -327,6 +382,28 @@ class ChatProvider extends ChangeNotifier {
     _currentSession!.messages.add(assistantMsg);
     notifyListeners();
 
+    // 同步到云端然后获取活跃消息
+    await _syncToCloud();
+
+    final List<Message> activeMessages;
+    if (_cloudConnected) {
+      final serverActive = await _dataService.getActiveMessages(_currentSession!.id);
+      final serverIds = serverActive.map((m) => m.id).toSet();
+      activeMessages = _currentSession!.messages
+          .where((m) => m.id != assistantMsg.id)
+          .where((m) => serverIds.contains(m.id))
+          .toList();
+      for (final msg in serverActive) {
+        if (!activeMessages.any((m) => m.id == msg.id)) {
+          activeMessages.add(msg);
+        }
+      }
+    } else {
+      activeMessages = _currentSession!.messages
+          .where((m) => m.id != assistantMsg.id)
+          .toList();
+    }
+
     // 调用 API，注入当前章节内容
     try {
       final enhancedSystemPrompt = '${_settings.systemPrompt}\n\n'
@@ -337,9 +414,7 @@ class ChatProvider extends ChangeNotifier {
           '用户刚才读了这一章，现在提出了关于本章内容的问题。请根据以上章节内容回答。';
 
       final response = await _apiService.chatCompletion(
-        messages: _currentSession!.messages
-            .where((m) => m.id != assistantMsg.id)
-            .toList(),
+        messages: activeMessages,
         model: _settings.model,
         temperature: _settings.temperature,
         maxTokens: _settings.maxTokens,

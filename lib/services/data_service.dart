@@ -153,6 +153,60 @@ class DataService {
     }
   }
 
+  // ── 归档管理 ────────────────────────────
+
+  /// 归档旧消息，只保留最近的活跃上下文
+  Future<Map<String, dynamic>> archiveSession(String sessionId,
+      {bool force = false}) async {
+    try {
+      final uri = Uri.parse('$_apiPrefix/sessions/$sessionId/archive')
+          .replace(queryParameters: force ? {'force': 'true'} : null);
+      final response = await _client
+          .post(uri)
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (_) {}
+    return {'archived': 0, 'active': 0, 'message': '归档请求失败'};
+  }
+
+  /// 获取未归档的活跃消息（用于喂给 AI 的上下文）
+  Future<List<Message>> getActiveMessages(String sessionId) async {
+    try {
+      final response = await _client
+          .get(Uri.parse('$_apiPrefix/sessions/$sessionId/active-messages'))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final messages = (data['messages'] as List).map((m) {
+          return Message(
+            id: m['id'] ?? '',
+            role: m['role'] ?? 'user',
+            content: m['content'] ?? '',
+            timestamp: DateTime.parse(
+                m['timestamp'] ?? DateTime.now().toIso8601String()),
+          );
+        }).toList();
+        return messages;
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  /// 获取归档状态
+  Future<Map<String, dynamic>> getArchiveStatus(String sessionId) async {
+    try {
+      final response = await _client
+          .get(Uri.parse('$_apiPrefix/sessions/$sessionId/archive-status'))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (_) {}
+    return {'needsArchive': false};
+  }
+
   // ── 搜索 ────────────────────────────────
 
   /// 搜索所有聊天记录
