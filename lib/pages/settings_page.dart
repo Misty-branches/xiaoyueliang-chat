@@ -94,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildTextField(
                 controller: _apiUrlController,
                 label: 'API 服务器地址',
-                hint: 'http://82.156.84.184:8642',
+                hint: 'http://你的服务器地址:8642',
                 icon: Icons.link_rounded,
                 isDark: isDark,
               ),
@@ -118,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildTextField(
                 controller: _dataServiceUrlController,
                 label: '数据服务地址',
-                hint: 'http://82.156.84.184:8643',
+                hint: 'http://你的服务器地址:8643',
                 icon: Icons.cloud_rounded,
                 isDark: isDark,
               ),
