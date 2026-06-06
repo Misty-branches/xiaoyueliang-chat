@@ -24,6 +24,8 @@ class ChatProvider extends ChangeNotifier {
   Book? _referencedBook;
   bool _cloudConnected = false; // 是否成功连接到了云端记录服务
 
+  int _themeVersion = 0; // 主题版本号，仅用于 Selector 判断主题是否变化
+
   List<Session> get sessions => _sessions;
   Session? get currentSession => _currentSession;
   AppSettings get settings => _settings;
@@ -33,6 +35,7 @@ class ChatProvider extends ChangeNotifier {
   Book? get referencedBook => _referencedBook;
   bool get cloudConnected => _cloudConnected;
   ThemeScheme get currentScheme => ThemeScheme.fromId(_settings.schemeId);
+  int get themeVersion => _themeVersion;
 
   ChatProvider() {
     _apiService = ApiService(baseUrl: _settings.apiUrl, apiKey: _settings.apiKey);
@@ -204,6 +207,7 @@ class ChatProvider extends ChangeNotifier {
     _apiService.updateApiKey(newSettings.apiKey);
     _dataService.updateBaseUrl(newSettings.dataServiceUrl);
     await _saveData();
+    _themeVersion++; // 主题变化，递增版本号通知 Selector
     notifyListeners();
 
     // 测试云端连接

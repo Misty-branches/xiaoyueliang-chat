@@ -27,8 +27,11 @@ class XiayueChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ChatProvider>(
-      builder: (context, provider, _) {
+    // 使用 Selector 监听主题版本号，只在主题变化时重建 MaterialApp
+    // 不会因为发消息/切换会话等操作触发全局重绘
+    return Selector<ChatProvider, int>(
+      selector: (_, provider) => provider.themeVersion,
+      builder: (context, _, provider) {
         final isDark = provider.settings.darkMode;
         final scheme = provider.currentScheme;
         final accentColor = scheme.primaryColorObj;
