@@ -330,6 +330,7 @@ class ChatProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
+    _isStreaming = false;
     _streamingContent = '';
     await _saveData();
     notifyListeners();
@@ -412,6 +413,7 @@ class ChatProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
+    _isStreaming = false;
     _streamingContent = '';
     await _saveData();
     notifyListeners();
