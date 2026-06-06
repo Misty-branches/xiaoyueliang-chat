@@ -31,9 +31,9 @@ class MessageBubble extends StatelessWidget {
     this.onShare,
     this.avatarUser = '',
     this.avatarXia = '',
-    this.userBubbleColor = Color(0xFFF8BBD0),
-    this.xiaBubbleColor = Color(0xFFFCE4EC),
-    this.primaryColor = Color(0xFFEC407A),
+    this.userBubbleColor = const Color(0xFFF8BBD0),
+    this.xiaBubbleColor = const Color(0xFFFCE4EC),
+    this.primaryColor = const Color(0xFFEC407A),
   });
 
   @override

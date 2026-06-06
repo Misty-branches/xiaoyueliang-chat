@@ -420,9 +420,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
-              color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+              ),
             ),
-          ),
+          ],
         ),
         Slider(
           value: value,
