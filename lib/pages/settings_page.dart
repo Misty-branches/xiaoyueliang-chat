@@ -87,11 +87,12 @@ class _SettingsPageState extends State<SettingsPage> {
     final cs = Theme.of(context).colorScheme;
     final provider = context.watch<ChatProvider>();
     final settings = provider.settings;
+    final scheme = provider.currentScheme;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF5F5F5),
+      backgroundColor: isDark ? scheme.darkBgColorObj : scheme.bgColorObj,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
         elevation: 0,
         title: const Text('设置'),
         actions: [
@@ -105,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16),
         children: [
           _buildSection(
-            isDark,
+            isDark, scheme,
             'API 配置',
             [
               _buildTextField(
@@ -114,6 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'http://你的服务器地址:8642',
                 icon: Icons.link_rounded,
                 isDark: isDark,
+                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -122,6 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'sk-...',
                 icon: Icons.vpn_key_rounded,
                 isDark: isDark,
+                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -130,6 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'deepseek-v4-flash',
                 icon: Icons.memory_rounded,
                 isDark: isDark,
+                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -138,6 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'http://你的服务器地址:8643',
                 icon: Icons.cloud_rounded,
                 isDark: isDark,
+                scheme: scheme,
               ),
               if (provider.cloudConnected)
                 Padding(
@@ -157,7 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark,
+            isDark, scheme,
             '生成参数',
             [
               _buildSlider(
@@ -185,7 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark,
+            isDark, scheme,
             '系统提示词',
             [
               TextField(
@@ -201,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: isDark ? Colors.grey.shade800 : Colors.white,
+                  fillColor: isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.7) : scheme.cardBgColorObj.withValues(alpha: 0.7),
                   hintText: '输入系统提示词...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
@@ -212,7 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark,
+            isDark, scheme,
             '主题装扮',
             [
               // 配色方案选择
@@ -306,7 +311,9 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Widget _buildSection(bool isDark, String title, List<Widget> children) {
+  Widget _buildSection(bool isDark, ThemeScheme scheme, String title, List<Widget> children) {
+    final cardBg = isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj;
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.grey.shade200;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -317,7 +324,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+              color: isDark ? Colors.grey.shade400 : scheme.primaryColorObj.withValues(alpha: 0.7),
               letterSpacing: 0.5,
             ),
           ),
@@ -325,10 +332,10 @@ class _SettingsPageState extends State<SettingsPage> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? Colors.grey.shade900 : Colors.white,
+            color: cardBg,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+              color: borderColor,
               width: 0.5,
             ),
           ),
@@ -347,6 +354,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required String hint,
     required IconData icon,
     required bool isDark,
+    ThemeScheme? scheme,
   }) {
     return TextField(
       controller: controller,
@@ -385,7 +393,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         filled: true,
-        fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+        fillColor: scheme != null
+            ? (isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.7) : scheme.cardBgColorObj.withValues(alpha: 0.7))
+            : (isDark ? Colors.grey.shade800 : Colors.grey.shade50),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
@@ -459,7 +469,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: (MediaQuery.of(context).size.width - 52) / 2 - 5,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                  color: isDark ? scheme.darkCardBgColorObj : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected ? primaryColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),

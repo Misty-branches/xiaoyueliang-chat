@@ -182,11 +182,12 @@ class _ChatPageState extends State<ChatPage> {
     final readingProvider = context.watch<ReadingProvider>();
     final session = chatProvider.currentSession;
     final settings = chatProvider.settings;
+    final scheme = chatProvider.currentScheme;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF5F5F5),
+      backgroundColor: isDark ? scheme.darkBgColorObj : scheme.bgColorObj,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
         elevation: 0,
         scrolledUnderElevation: 1,
         titleSpacing: 0,
@@ -224,7 +225,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
-      drawer: _buildSessionDrawer(context, isDark, chatProvider),
+      drawer: _buildSessionDrawer(context, isDark, scheme, chatProvider),
       body: Column(
         children: [
           // 阅读状态栏
@@ -432,10 +433,10 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildSessionDrawer(BuildContext context, bool isDark, ChatProvider provider) {
+  Widget _buildSessionDrawer(BuildContext context, bool isDark, ThemeScheme scheme, ChatProvider provider) {
     final cs = Theme.of(context).colorScheme;
     return Drawer(
-      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+      backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

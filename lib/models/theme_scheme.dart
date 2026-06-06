@@ -14,6 +14,8 @@ class ThemeScheme {
   final int darkBgColor; // 聊天背景色（暗色）
   final int darkUserBubbleColor; // 用户气泡色（暗色）
   final int darkXiaBubbleColor; // 遐气泡色（暗色）
+  final int cardBgColor; // 卡片/section背景色（亮色）
+  final int darkCardBgColor; // 卡片/section背景色（暗色）
 
   const ThemeScheme({
     required this.id,
@@ -28,6 +30,8 @@ class ThemeScheme {
     this.darkBgColor = 0xFF1A1A2E,
     this.darkUserBubbleColor = 0xFF3A3A5C,
     this.darkXiaBubbleColor = 0xFF16213E,
+    this.cardBgColor = 0xFFFFFFFF,
+    this.darkCardBgColor = 0xFF2A2A3A,
   });
 
   Color get primaryColorObj => Color(primaryColor);
@@ -38,6 +42,8 @@ class ThemeScheme {
   Color get darkBgColorObj => Color(darkBgColor);
   Color get darkUserBubbleColorObj => Color(darkUserBubbleColor);
   Color get darkXiaBubbleColorObj => Color(darkXiaBubbleColor);
+  Color get cardBgColorObj => Color(cardBgColor);
+  Color get darkCardBgColorObj => Color(darkCardBgColor);
 
   /// 预设五套配色方案
   static const List<ThemeScheme> presets = [
@@ -57,6 +63,8 @@ class ThemeScheme {
       darkBgColor: 0xFF1A1A2E,
       darkUserBubbleColor: 0xFF4A2D3E,
       darkXiaBubbleColor: 0xFF2D1F28,
+      cardBgColor: 0xFFFFFFFF,
+      darkCardBgColor: 0xFF2D2D3D,
     ),
     //
     // ② 暖茶拿铁
@@ -74,6 +82,8 @@ class ThemeScheme {
       darkBgColor: 0xFF2A2420,
       darkUserBubbleColor: 0xFF4A3F3A,
       darkXiaBubbleColor: 0xFF3A302B,
+      cardBgColor: 0xFFFFFFFF,
+      darkCardBgColor: 0xFF3A3430,
     ),
     //
     // ③ 雾紫灰
@@ -91,6 +101,8 @@ class ThemeScheme {
       darkBgColor: 0xFF1E1C24,
       darkUserBubbleColor: 0xFF3C3848,
       darkXiaBubbleColor: 0xFF2A2833,
+      cardBgColor: 0xFFFFFFFF,
+      darkCardBgColor: 0xFF2E2C38,
     ),
     //
     // ④ 暮霭玫瑰
@@ -108,6 +120,8 @@ class ThemeScheme {
       darkBgColor: 0xFF262020,
       darkUserBubbleColor: 0xFF443B3B,
       darkXiaBubbleColor: 0xFF332B2B,
+      cardBgColor: 0xFFFFFFFF,
+      darkCardBgColor: 0xFF363030,
     ),
     //
     // ⑤ 松烟绿
@@ -125,6 +139,8 @@ class ThemeScheme {
       darkBgColor: 0xFF1A221E,
       darkUserBubbleColor: 0xFF2D4032,
       darkXiaBubbleColor: 0xFF223028,
+      cardBgColor: 0xFFFFFFFF,
+      darkCardBgColor: 0xFF2A322E,
     ),
   ];
 

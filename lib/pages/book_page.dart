@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/book_provider.dart';
+import '../providers/chat_provider.dart';
 import '../models/book.dart';
+import '../models/theme_scheme.dart';
 
 class BookPage extends StatefulWidget {
   const BookPage({super.key});
@@ -15,12 +17,13 @@ class _BookPageState extends State<BookPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bookProvider = context.watch<BookProvider>();
+    final scheme = context.watch<ChatProvider>().currentScheme;
     final books = bookProvider.books;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF5F5F5),
+      backgroundColor: isDark ? scheme.darkBgColorObj : scheme.bgColorObj,
       appBar: AppBar(
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
         elevation: 0,
         title: Row(
           children: [
@@ -226,6 +229,7 @@ class _BookCard extends StatelessWidget {
     // Estimate character count excluding whitespace
     final charCount = book.content.replaceAll(RegExp(r'\s+'), '').length;
     final wordCount = book.content.split(RegExp(r'\s+')).length;
+    final scheme = context.read<ChatProvider>().currentScheme;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -233,11 +237,11 @@ class _BookCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          color: isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.5) : Colors.grey.shade200,
           width: 0.5,
         ),
       ),
-      color: isDark ? Colors.grey.shade900 : Colors.white,
+      color: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onQuote,
@@ -389,10 +393,11 @@ class _AddBookSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.read<ChatProvider>().currentScheme;
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 32),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey.shade900 : Colors.white,
+        color: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(

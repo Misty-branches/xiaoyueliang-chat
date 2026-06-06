@@ -56,7 +56,7 @@ class XiayueChatApp extends StatelessWidget {
       colorSchemeSeed: accent,
       scaffoldBackgroundColor: scheme.bgColorObj,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: scheme.cardBgColorObj,
         foregroundColor: Colors.grey.shade800,
         elevation: 0,
         centerTitle: false,
@@ -66,14 +66,14 @@ class XiayueChatApp extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: Colors.white,
+      drawerTheme: DrawerThemeData(
+        backgroundColor: scheme.cardBgColorObj,
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.pink.shade100, width: 0.5),
+          side: BorderSide(color: scheme.primaryColorObj.withValues(alpha: 0.2), width: 0.5),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -92,7 +92,7 @@ class XiayueChatApp extends StatelessWidget {
       colorSchemeSeed: accent,
       scaffoldBackgroundColor: scheme.darkBgColorObj,
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: scheme.darkCardBgColorObj,
         foregroundColor: Colors.grey.shade200,
         elevation: 0,
         centerTitle: false,
@@ -103,13 +103,13 @@ class XiayueChatApp extends StatelessWidget {
         ),
       ),
       drawerTheme: DrawerThemeData(
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: scheme.darkCardBgColorObj,
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.pink.shade900.withValues(alpha: 0.3), width: 0.5),
+          side: BorderSide(color: scheme.primaryColorObj.withValues(alpha: 0.3), width: 0.5),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
