@@ -194,55 +194,64 @@ class MessageBubble extends StatelessWidget {
 
   /// 操作栏：复制 | 重生成 | 朗读 | ⋮更多
   Widget _buildActionBar(BuildContext context, bool isDark, bool isUser) {
-    // 操作栏左对齐（与气泡对齐）
     final iconSize = 18.0;
     final iconColor = isDark ? Colors.grey.shade500 : Colors.grey.shade400;
 
+    final actionRow = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ActionButton(
+          icon: Icons.content_copy_outlined,
+          size: iconSize,
+          color: iconColor,
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: message.content));
+            ScaffoldMessenger.of(context).showSnackBar(
+              _buildSnackBar('已复制', isDark, context),
+            );
+          },
+        ),
+        const SizedBox(width: 16),
+        if (!isUser)
+          _ActionButton(
+            icon: Icons.refresh_outlined,
+            size: iconSize,
+            color: iconColor,
+            onTap: onRegenerate,
+          ),
+        if (!isUser) const SizedBox(width: 16),
+        if (!isUser)
+          _ActionButton(
+            icon: Icons.volume_up_outlined,
+            size: iconSize,
+            color: iconColor,
+            onTap: onRead,
+          ),
+        if (!isUser) const SizedBox(width: 16),
+        _ActionButton(
+          icon: Icons.more_horiz_outlined,
+          size: iconSize,
+          color: iconColor,
+          onTap: () => _showMessageMenu(context, isDark),
+        ),
+      ],
+    );
+
+    // 用户消息→操作栏右对齐；遐消息→操作栏左对齐（头像下方缩进）
     return Padding(
       padding: EdgeInsets.only(
-        left: isUser ? 12 : 56,   // 用户消息：12；遐消息：头像(32)+间距(8)+12
         right: 12,
         bottom: 2,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _ActionButton(
-            icon: Icons.content_copy_outlined,
-            size: iconSize,
-            color: iconColor,
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: message.content));
-              ScaffoldMessenger.of(context).showSnackBar(
-                _buildSnackBar('已复制', isDark, context),
-              );
-            },
-          ),
-          const SizedBox(width: 16),
-          if (!isUser)
-            _ActionButton(
-              icon: Icons.refresh_outlined,
-              size: iconSize,
-              color: iconColor,
-              onTap: onRegenerate,
+      child: isUser
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [actionRow],
+            )
+          : Padding(
+              padding: const EdgeInsets.only(left: 56),
+              child: actionRow,
             ),
-          if (!isUser) const SizedBox(width: 16),
-          if (!isUser)
-            _ActionButton(
-              icon: Icons.volume_up_outlined,
-              size: iconSize,
-              color: iconColor,
-              onTap: onRead,
-            ),
-          if (!isUser) const SizedBox(width: 16),
-          _ActionButton(
-            icon: Icons.more_horiz_outlined,
-            size: iconSize,
-            color: iconColor,
-            onTap: () => _showMessageMenu(context, isDark),
-          ),
-        ],
-      ),
     );
   }
 
