@@ -189,14 +189,16 @@ class _ChatPageState extends State<ChatPage> {
         elevation: 0,
         scrolledUnderElevation: 1,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu_rounded,
-            color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: Icon(
+              Icons.menu_rounded,
+              color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+            ),
+            onPressed: () {
+              Scaffold.of(ctx).openDrawer();
+            },
           ),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
         ),
         title: Text(
           readingProvider.isReading

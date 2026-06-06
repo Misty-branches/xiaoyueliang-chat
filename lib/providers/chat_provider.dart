@@ -241,9 +241,11 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> sendMessage(String content) async {
-    if (content.trim().isEmpty || _isStreaming || _currentSession == null) return;
+    if (content.trim().isEmpty || _isLoading || _currentSession == null) return;
 
     _isLoading = true;
+    _isStreaming = true;
+    _streamingContent = '';
     notifyListeners();
 
     // 检查是否需要归档旧消息（本地估算活跃消息大小）
@@ -266,52 +268,29 @@ class ChatProvider extends ChangeNotifier {
           ? '${content.trim().substring(0, 30)}...'
           : content.trim();
     }
-
-    _isLoading = false;
-    _isStreaming = true;
-    _streamingContent = '';
-    notifyListeners();
-
-    // 创建占位消息
-    final assistantMsg = Message(
-      id: _uuid.v4(),
-      role: 'assistant',
-      content: '',
-      isStreaming: true,
-    );
-    _currentSession!.messages.add(assistantMsg);
     notifyListeners();
 
     // 同步用户消息到云端
     await _syncToCloud();
 
-    // 获取未归档的活跃消息用于 API 请求（合并本地+云端）
+    // 获取未归档的活跃消息用于 API 请求
     final List<Message> activeMessages;
     if (_cloudConnected) {
-      // 从服务器获取已归档/未归档的消息ID
       final serverActive = await _dataService.getActiveMessages(_currentSession!.id);
       final serverIds = serverActive.map((m) => m.id).toSet();
-      
-      // 本地消息中：只在服务器活跃列表里的
       activeMessages = _currentSession!.messages
-          .where((m) => m.id != assistantMsg.id)
           .where((m) => serverIds.contains(m.id))
           .toList();
-      
-      // 补上服务器有但本地没有的消息（比如从别的设备同步的）
       for (final msg in serverActive) {
         if (!activeMessages.any((m) => m.id == msg.id)) {
           activeMessages.add(msg);
         }
       }
     } else {
-      // 云端不可用时，用全部本地消息
-      activeMessages = _currentSession!.messages
-          .where((m) => m.id != assistantMsg.id)
-          .toList();
+      activeMessages = _currentSession!.messages.toList();
     }
 
-    // 调用 API
+    // 调用 API（非流式：等完整响应再一次性显示）
     try {
       final response = await _apiService.chatCompletion(
         messages: activeMessages,
@@ -322,35 +301,46 @@ class ChatProvider extends ChangeNotifier {
         bookTitle: _referencedBook?.title,
         bookContent: _referencedBook?.content,
       );
-      assistantMsg.content = response;
-      notifyListeners();
-    } catch (e) {
-      assistantMsg.content = '请求失败: $e';
-    }
 
-    // 完成流式
-    _currentSession!.messages.last = assistantMsg.copyWith(isStreaming: false);
-    _isStreaming = false;
-    _streamingContent = '';
-    _currentSession!.updatedAt = DateTime.now();
-    await _saveData();
-
-    // 最终同步到云端
-    if (_cloudConnected) {
-      _dataService.updateMessage(
-        _currentSession!.id,
-        assistantMsg.id,
-        assistantMsg.content,
+      // API 返回完整内容后，创建一次性消息
+      final assistantMsg = Message(
+        id: _uuid.v4(),
+        role: 'assistant',
+        content: response,
       );
+      _currentSession!.messages.add(assistantMsg);
+      _currentSession!.updatedAt = DateTime.now();
+
+      // 同步到云端
+      if (_cloudConnected) {
+        _dataService.updateMessage(
+          _currentSession!.id,
+          assistantMsg.id,
+          assistantMsg.content,
+        );
+      }
+    } catch (e) {
+      // 错误消息也一次性显示
+      final errorMsg = Message(
+        id: _uuid.v4(),
+        role: 'assistant',
+        content: '请求失败: $e',
+      );
+      _currentSession!.messages.add(errorMsg);
     }
 
+    _isLoading = false;
+    _streamingContent = '';
+    await _saveData();
     notifyListeners();
   }
 
   Future<void> sendMessageWithChapter(String text, Book book, Chapter chapter) async {
-    if (text.trim().isEmpty || _isStreaming || _currentSession == null) return;
+    if (text.trim().isEmpty || _isLoading || _currentSession == null) return;
 
     _isLoading = true;
+    _isStreaming = true;
+    _streamingContent = '';
     notifyListeners();
 
     // 检查是否需要归档
@@ -366,20 +356,6 @@ class ChatProvider extends ChangeNotifier {
     );
     _currentSession!.messages.add(userMsg);
     _currentSession!.updatedAt = DateTime.now();
-
-    _isLoading = false;
-    _isStreaming = true;
-    _streamingContent = '';
-    notifyListeners();
-
-    // 创建占位消息
-    final assistantMsg = Message(
-      id: _uuid.v4(),
-      role: 'assistant',
-      content: '',
-      isStreaming: true,
-    );
-    _currentSession!.messages.add(assistantMsg);
     notifyListeners();
 
     // 同步到云端然后获取活跃消息
@@ -390,7 +366,6 @@ class ChatProvider extends ChangeNotifier {
       final serverActive = await _dataService.getActiveMessages(_currentSession!.id);
       final serverIds = serverActive.map((m) => m.id).toSet();
       activeMessages = _currentSession!.messages
-          .where((m) => m.id != assistantMsg.id)
           .where((m) => serverIds.contains(m.id))
           .toList();
       for (final msg in serverActive) {
@@ -399,9 +374,7 @@ class ChatProvider extends ChangeNotifier {
         }
       }
     } else {
-      activeMessages = _currentSession!.messages
-          .where((m) => m.id != assistantMsg.id)
-          .toList();
+      activeMessages = _currentSession!.messages.toList();
     }
 
     // 调用 API，注入当前章节内容
@@ -420,16 +393,26 @@ class ChatProvider extends ChangeNotifier {
         maxTokens: _settings.maxTokens,
         systemPrompt: enhancedSystemPrompt,
       );
-      assistantMsg.content = response;
-      notifyListeners();
+
+      // API 返回完整内容后，创建一次性消息
+      final assistantMsg = Message(
+        id: _uuid.v4(),
+        role: 'assistant',
+        content: response,
+      );
+      _currentSession!.messages.add(assistantMsg);
+      _currentSession!.updatedAt = DateTime.now();
     } catch (e) {
-      assistantMsg.content = '请求失败: $e';
+      final errorMsg = Message(
+        id: _uuid.v4(),
+        role: 'assistant',
+        content: '请求失败: $e',
+      );
+      _currentSession!.messages.add(errorMsg);
     }
 
-    _currentSession!.messages.last = assistantMsg.copyWith(isStreaming: false);
-    _isStreaming = false;
+    _isLoading = false;
     _streamingContent = '';
-    _currentSession!.updatedAt = DateTime.now();
     await _saveData();
     notifyListeners();
   }
@@ -453,16 +436,9 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void cancelStreaming() {
-    if (_isStreaming && _currentSession != null) {
-      final lastMsg = _currentSession!.messages.last;
-      if (lastMsg.isStreaming && lastMsg.content.isEmpty) {
-        _currentSession!.messages.removeLast();
-      } else if (lastMsg.isStreaming) {
-        _currentSession!.messages.last = lastMsg.copyWith(isStreaming: false);
-      }
-      _isStreaming = false;
-      _streamingContent = '';
-      notifyListeners();
-    }
+    _isLoading = false;
+    _isStreaming = false;
+    _streamingContent = '';
+    notifyListeners();
   }
 }

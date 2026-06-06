@@ -127,9 +127,7 @@ class MessageBubble extends StatelessWidget {
                             ),
                           ),
                           child: MarkdownBody(
-                            data: message.isStreaming
-                                ? '${message.content}▌'
-                                : message.content,
+                            data: message.content,
                             styleSheet: MarkdownStyleSheet(
                               p: TextStyle(
                                 color: isDark ? Colors.grey.shade200 : Colors.black87,
