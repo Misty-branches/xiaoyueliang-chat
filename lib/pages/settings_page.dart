@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../models/settings.dart';
+import '../models/theme_scheme.dart';
 import '../providers/chat_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -19,6 +23,10 @@ class _SettingsPageState extends State<SettingsPage> {
   late TextEditingController _dataServiceUrlController;
   late double _temperature;
   late int _maxTokens;
+  late int _accentColor;
+  String _avatarUser = '';
+  String _avatarXia = '';
+  String _schemeId = 'peach-blossom';
 
   @override
   void initState() {
@@ -31,6 +39,10 @@ class _SettingsPageState extends State<SettingsPage> {
     _dataServiceUrlController = TextEditingController(text: settings.dataServiceUrl);
     _temperature = settings.temperature;
     _maxTokens = settings.maxTokens;
+    _accentColor = settings.accentColor;
+    _avatarUser = settings.avatarUser;
+    _avatarXia = settings.avatarXia;
+    _schemeId = settings.schemeId;
   }
 
   @override
@@ -54,6 +66,10 @@ class _SettingsPageState extends State<SettingsPage> {
       darkMode: provider.settings.darkMode,
       systemPrompt: _systemPromptController.text.trim(),
       dataServiceUrl: _dataServiceUrlController.text.trim(),
+      accentColor: _accentColor,
+      avatarUser: _avatarUser,
+      avatarXia: _avatarXia,
+      schemeId: _schemeId,
     ));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -68,6 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final provider = context.watch<ChatProvider>();
     final settings = provider.settings;
 
@@ -196,8 +213,17 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 16),
           _buildSection(
             isDark,
-            '外观',
+            '主题装扮',
             [
+              // 配色方案选择
+              _buildSchemeSelector(isDark, cs),
+              const SizedBox(height: 16),
+              // 头像
+              Text('头像', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+              const SizedBox(height: 10),
+              _buildAvatarRow(cs, isDark),
+              const SizedBox(height: 16),
+              // 深色模式
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(
@@ -210,7 +236,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (v) {
                   provider.updateSettings(settings.copyWith(darkMode: v));
                 },
-                activeColor: Colors.blue.shade600,
+                activeColor: cs.primary,
               ),
             ],
           ),
@@ -354,7 +380,7 @@ class _SettingsPageState extends State<SettingsPage> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.blue.shade400,
+            color: Theme.of(context).colorScheme.primary,
             width: 1.5,
           ),
         ),
@@ -394,20 +420,133 @@ class _SettingsPageState extends State<SettingsPage> {
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
-              ),
+              color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
             ),
-          ],
+          ),
         ),
         Slider(
           value: value,
           min: min,
           max: max,
           divisions: divisions,
-          activeColor: Colors.blue.shade500,
+          activeColor: Theme.of(context).colorScheme.primary,
           inactiveColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
           onChanged: onChanged,
         ),
       ],
     );
+  }
+
+  /// 配色方案选择器 — 卡片式，每行两个
+  Widget _buildSchemeSelector(bool isDark, ColorScheme cs) {
+    final schemes = ThemeScheme.presets;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('配色方案', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: schemes.map((scheme) {
+            final isSelected = _schemeId == scheme.id;
+            final userColor = scheme.userBubbleColorObj;
+            final xiaColor = scheme.xiaBubbleColorObj;
+            final primaryColor = scheme.primaryColorObj;
+            return GestureDetector(
+              onTap: () => setState(() => _schemeId = scheme.id),
+              child: Container(
+                width: (MediaQuery.of(context).size.width - 52) / 2 - 5,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? primaryColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 颜色预览 — 三个小圆点
+                    Row(
+                      children: [
+                        Container(width: 16, height: 16, decoration: BoxDecoration(color: userColor, shape: BoxShape.circle, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, width: 0.5))),
+                        const SizedBox(width: 6),
+                        Container(width: 16, height: 16, decoration: BoxDecoration(color: xiaColor, shape: BoxShape.circle, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, width: 0.5))),
+                        const SizedBox(width: 6),
+                        Container(width: 16, height: 16, decoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // 方案名称 + 选中标记
+                    Row(
+                      children: [
+                        Expanded(child: Text(scheme.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.grey.shade200 : Colors.black87), overflow: TextOverflow.ellipsis)),
+                        if (isSelected) Icon(Icons.check_circle, size: 16, color: primaryColor),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(scheme.description, style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// 头像选择行
+  Widget _buildAvatarRow(ColorScheme cs, bool isDark) {
+    return Row(
+      children: [
+        Expanded(child: Column(children: [
+          _buildAvatarPreview(base64Str: _avatarUser, fallbackText: '满', bgColor: cs.primary.withValues(alpha: 0.2), accentColor: cs.primary, isDark: isDark),
+          const SizedBox(height: 6),
+          Text('我的头像', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+        ])),
+        const SizedBox(width: 16),
+        Expanded(child: Column(children: [
+          _buildAvatarPreview(base64Str: _avatarXia, fallbackText: '遐', bgColor: cs.primary.withValues(alpha: 0.2), accentColor: cs.primary, isDark: isDark),
+          const SizedBox(height: 6),
+          Text('遐的头像', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+        ])),
+      ],
+    );
+  }
+
+  /// 头像预览 + 点击更换
+  Widget _buildAvatarPreview({required String base64Str, required String fallbackText, required Color bgColor, required Color accentColor, required bool isDark}) {
+    return GestureDetector(
+      onTap: () => _pickImage(base64Str == _avatarUser),
+      child: Container(
+        width: 64, height: 64,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade300)),
+        child: ClipOval(
+          child: base64Str.isNotEmpty
+              ? Image.memory(base64Decode(base64Str), fit: BoxFit.cover)
+              : Icon(Icons.person_outline, size: 28, color: accentColor),
+        ),
+      ),
+    );
+  }
+
+  void _pickImage(bool isUser) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+      if (result != null && result.files.single.bytes != null) {
+        final base64Str = base64Encode(result.files.single.bytes!);
+        setState(() {
+          if (isUser) { _avatarUser = base64Str; } else { _avatarXia = base64Str; }
+        });
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('选择图片失败: $e'), behavior: SnackBarBehavior.floating));
+      }
+    }
   }
 }

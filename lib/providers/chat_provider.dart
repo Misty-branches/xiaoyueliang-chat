@@ -7,6 +7,7 @@ import '../models/session.dart';
 import '../models/settings.dart';
 import '../models/book.dart';
 import '../models/chapter.dart';
+import '../models/theme_scheme.dart';
 import '../services/api_service.dart';
 import '../services/data_service.dart';
 
@@ -31,6 +32,7 @@ class ChatProvider extends ChangeNotifier {
   String get streamingContent => _streamingContent;
   Book? get referencedBook => _referencedBook;
   bool get cloudConnected => _cloudConnected;
+  ThemeScheme get currentScheme => ThemeScheme.fromId(_settings.schemeId);
 
   ChatProvider() {
     _apiService = ApiService(baseUrl: _settings.apiUrl, apiKey: _settings.apiKey);

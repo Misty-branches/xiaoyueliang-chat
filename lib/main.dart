@@ -6,6 +6,7 @@ import 'providers/reading_provider.dart';
 import 'pages/chat_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/book_page.dart';
+import 'models/theme_scheme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,11 +30,13 @@ class XiayueChatApp extends StatelessWidget {
     return Consumer<ChatProvider>(
       builder: (context, provider, _) {
         final isDark = provider.settings.darkMode;
+        final scheme = provider.currentScheme;
+        final accentColor = scheme.primaryColorObj;
         return MaterialApp(
           title: '遐悦聊天',
           debugShowCheckedModeBanner: false,
-          theme: _buildLightTheme(),
-          darkTheme: _buildDarkTheme(),
+          theme: _buildLightTheme(accentColor, scheme),
+          darkTheme: _buildDarkTheme(accentColor, scheme),
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
           initialRoute: '/',
           routes: {
@@ -46,19 +49,19 @@ class XiayueChatApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildLightTheme() {
+  ThemeData _buildLightTheme(Color accent, ThemeScheme scheme) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorSchemeSeed: const Color(0xFF3B82F6),
-      scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-      appBarTheme: const AppBarTheme(
+      colorSchemeSeed: accent,
+      scaffoldBackgroundColor: scheme.bgColorObj,
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
-        foregroundColor: Color(0xFF1F2937),
+        foregroundColor: Colors.grey.shade800,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: Color(0xFF1F2937),
+          color: Colors.grey.shade800,
           fontSize: 17,
           fontWeight: FontWeight.w600,
         ),
@@ -70,7 +73,7 @@ class XiayueChatApp extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFFE5E7EB), width: 0.5),
+          side: BorderSide(color: Colors.pink.shade100, width: 0.5),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -82,31 +85,31 @@ class XiayueChatApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildDarkTheme() {
+  ThemeData _buildDarkTheme(Color accent, ThemeScheme scheme) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorSchemeSeed: const Color(0xFF60A5FA),
-      scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF111111),
-        foregroundColor: Color(0xFFE5E7EB),
+      colorSchemeSeed: accent,
+      scaffoldBackgroundColor: scheme.darkBgColorObj,
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF16213E),
+        foregroundColor: Colors.grey.shade200,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: Color(0xFFE5E7EB),
+          color: Colors.grey.shade200,
           fontSize: 17,
           fontWeight: FontWeight.w600,
         ),
       ),
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: Color(0xFF111111),
+      drawerTheme: DrawerThemeData(
+        backgroundColor: const Color(0xFF16213E),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFF1F2937), width: 0.5),
+          side: BorderSide(color: Colors.pink.shade900.withValues(alpha: 0.3), width: 0.5),
         ),
       ),
       snackBarTheme: SnackBarThemeData(

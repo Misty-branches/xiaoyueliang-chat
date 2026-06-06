@@ -52,6 +52,7 @@ class _InputBarState extends State<InputBar> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
@@ -137,7 +138,7 @@ class _InputBarState extends State<InputBar> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: _hasText
-                            ? (isDark ? Colors.blue.shade600 : Colors.blue.shade500)
+                            ? cs.primary
                             : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                         borderRadius: BorderRadius.circular(20),
                       ),

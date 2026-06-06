@@ -181,6 +181,7 @@ class _ChatPageState extends State<ChatPage> {
     final chatProvider = context.watch<ChatProvider>();
     final readingProvider = context.watch<ReadingProvider>();
     final session = chatProvider.currentSession;
+    final settings = chatProvider.settings;
 
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF5F5F5),
@@ -239,6 +240,11 @@ class _ChatPageState extends State<ChatPage> {
                     itemBuilder: (context, index) {
                       return MessageBubble(
                         message: session.messages[index],
+                        avatarUser: settings.avatarUser,
+                        avatarXia: settings.avatarXia,
+                        userBubbleColor: chatProvider.currentScheme.userBubbleColorObj,
+                        xiaBubbleColor: chatProvider.currentScheme.xiaBubbleColorObj,
+                        primaryColor: chatProvider.currentScheme.primaryColorObj,
                         onDelete: () => chatProvider.deleteMessage(index),
                         onRegenerate: () {
                           if (session.messages.length > index + 1) {
@@ -290,14 +296,15 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildReadingBar(bool isDark, ReadingProvider provider) {
     final book = provider.currentBook;
     if (book == null) return const SizedBox.shrink();
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? Colors.indigo.shade900.withValues(alpha: 0.3) : Colors.indigo.shade50,
+        color: cs.primaryContainer.withValues(alpha: isDark ? 0.3 : 0.6),
         border: Border(
           bottom: BorderSide(
-            color: isDark ? Colors.indigo.shade700 : Colors.indigo.shade200,
+            color: cs.primary.withValues(alpha: isDark ? 0.4 : 0.2),
             width: 0.5,
           ),
         ),
@@ -307,7 +314,7 @@ class _ChatPageState extends State<ChatPage> {
           Icon(
             Icons.auto_stories_rounded,
             size: 16,
-            color: isDark ? Colors.indigo.shade300 : Colors.indigo.shade600,
+            color: cs.primary,
           ),
           const SizedBox(width: 6),
           Expanded(
@@ -316,7 +323,7 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isDark ? Colors.indigo.shade200 : Colors.indigo.shade700,
+                color: isDark ? cs.onPrimaryContainer : cs.primary,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -346,7 +353,7 @@ class _ChatPageState extends State<ChatPage> {
               child: Icon(
                 Icons.close_rounded,
                 size: 16,
-                color: isDark ? Colors.indigo.shade300 : Colors.indigo.shade600,
+                color: cs.primary,
               ),
             ),
           ),
@@ -356,6 +363,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildEmptyState(bool isDark, ReadingProvider readingProvider) {
+    final cs = Theme.of(context).colorScheme;
     if (readingProvider.isReading && readingProvider.currentChapter != null) {
       // 阅读模式下显示当前章节内容
       final ch = readingProvider.currentChapter!;
@@ -368,7 +376,7 @@ class _ChatPageState extends State<ChatPage> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: isDark ? Colors.indigo.shade900.withValues(alpha: 0.3) : Colors.indigo.shade50,
+                color: cs.primaryContainer.withValues(alpha: isDark ? 0.3 : 0.6),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -376,7 +384,7 @@ class _ChatPageState extends State<ChatPage> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.indigo.shade200 : Colors.indigo.shade700,
+                  color: isDark ? cs.onPrimaryContainer : cs.primary,
                 ),
               ),
             ),
@@ -425,6 +433,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildSessionDrawer(BuildContext context, bool isDark, ChatProvider provider) {
+    final cs = Theme.of(context).colorScheme;
     return Drawer(
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
       child: SafeArea(
@@ -441,13 +450,13 @@ class _ChatPageState extends State<ChatPage> {
                     children: [
                       CircleAvatar(
                         radius: 24,
-                        backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade100,
+                        backgroundColor: cs.primaryContainer,
                         child: Text(
                           '遐',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
+                            color: cs.onPrimaryContainer,
                           ),
                         ),
                       ),
@@ -485,8 +494,8 @@ class _ChatPageState extends State<ChatPage> {
                       icon: const Icon(Icons.add_rounded, size: 18),
                       label: const Text('新建对话'),
                       style: TextButton.styleFrom(
-                        backgroundColor: isDark ? Colors.blueGrey.shade800 : Colors.blue.shade50,
-                        foregroundColor: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
+                        backgroundColor: isDark ? Colors.grey.shade800 : cs.primaryContainer,
+                        foregroundColor: isDark ? cs.primary : cs.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
