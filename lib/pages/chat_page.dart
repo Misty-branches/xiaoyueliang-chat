@@ -7,6 +7,7 @@ import '../widgets/message_bubble.dart';
 import '../widgets/input_bar.dart';
 import '../models/book.dart';
 import '../services/chapter_parser.dart';
+import '../models/theme_scheme.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
