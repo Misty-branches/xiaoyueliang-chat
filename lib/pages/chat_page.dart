@@ -233,9 +233,13 @@ class _ChatPageState extends State<ChatPage> {
           if (readingProvider.isReading) _buildReadingBar(isDark, readingProvider),
           // 消息列表
           Expanded(
-            child: session == null || session.messages.isEmpty
-                ? _buildEmptyState(isDark, readingProvider)
-                : ListView.builder(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: _buildBgGradient(isDark, scheme),
+              ),
+              child: session == null || session.messages.isEmpty
+                  ? _buildEmptyState(isDark, readingProvider)
+                  : ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     itemCount: session.messages.length,
@@ -431,6 +435,23 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
+    );
+  }
+
+
+
+  /// 聊天背景微晕染：从中心到边缘的径向渐变
+  RadialGradient _buildBgGradient(bool isDark, ThemeScheme scheme) {
+    final bg = isDark ? scheme.darkBgColorObj : scheme.bgColorObj;
+    // 中心略微提亮，边缘还原底色
+    final center = isDark
+        ? Color.lerp(bg, Colors.white, 0.06)!
+        : Color.lerp(bg, Colors.white, 0.12)!;
+    return RadialGradient(
+      center: Alignment.center,
+      radius: 1.3,
+      colors: [center, bg],
+      stops: const [0.0, 1.0],
     );
   }
 

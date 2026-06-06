@@ -42,13 +42,46 @@ class XiayueChatApp extends StatelessWidget {
           darkTheme: _buildDarkTheme(accentColor, scheme),
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
           initialRoute: '/',
-          routes: {
-            '/': (context) => const ChatPage(),
-            '/settings': (context) => const SettingsPage(),
-            '/book': (context) => const BookPage(),
+          onGenerateRoute: (settings) {
+            Widget page;
+            switch (settings.name) {
+              case '/':
+                page = const ChatPage();
+                break;
+              case '/settings':
+                page = const SettingsPage();
+                break;
+              case '/book':
+                page = const BookPage();
+                break;
+              default:
+                return null;
+            }
+            return _buildPageRoute(page);
           },
         );
       },
+    );
+  }
+
+  /// 页面切换动效：从右侧滑动 + 淡入，250ms easeOutCubic
+  static PageRouteBuilder _buildPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (_, __, ___) => page,
+      transitionsBuilder: (_, animation, __, child) {
+        final slideTween = Tween<Offset>(
+          begin: const Offset(0.08, 0.0),
+          end: Offset.zero,
+        ).chain(CurveTween(curve: Curves.easeOutCubic));
+        return FadeTransition(
+          opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
+          child: SlideTransition(
+            position: animation.drive(slideTween),
+            child: child,
+          ),
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 250),
     );
   }
 
