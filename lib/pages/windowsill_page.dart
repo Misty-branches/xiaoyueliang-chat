@@ -169,9 +169,9 @@ class WindowsillPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const Spacer(),
 
-              // ---- SVG 装饰（靠上一点，不会被推到看不见） ----
+              // ---- SVG 装饰（在圆点上方一点） ----
               FloatingDecor(
                 borderColor: c.border,
                 fillColor: c.border,
