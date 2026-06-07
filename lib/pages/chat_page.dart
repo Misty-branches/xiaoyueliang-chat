@@ -41,6 +41,11 @@ class _ChatPageState extends State<ChatPage> {
     _scrollToBottom();
   }
 
+  String _formatDate(DateTime dt) {
+    final days = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+    return '${dt.month}月${dt.day}日 ${days[dt.weekday - 1]}';
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -56,134 +61,182 @@ class _ChatPageState extends State<ChatPage> {
     final session = chatProvider.currentSession;
     final settings = chatProvider.settings;
     final scheme = chatProvider.currentScheme;
+    final topInset = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: c.bg,
-      // ---- 月下窗风格顶栏 ----
-      appBar: AppBar(
-        backgroundColor: c.surface,
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: c.inkSec),
-          onPressed: () => Navigator.pop(context),
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: _buildBgGradient(isDark, scheme),
         ),
-        title: Text(
-          readingProvider.isReading
-              ? '📖 ${readingProvider.currentBook?.title ?? ""}'
-              : (session?.title ?? '与遐对话'),
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: c.ink),
-          overflow: TextOverflow.ellipsis,
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.menu_rounded, size: 20, color: c.inkSec),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ],
-      ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              SizedBox(height: topInset > 0 ? topInset : 8),
 
-      // ---- 会话抽屉 ----
-      drawer: _buildSessionDrawer(context, isDark, c, chatProvider, scheme),
+              // ===== 顶栏 =====
+              _buildHeader(c),
 
-      // ---- 主体 ----
-      body: Column(
-        children: [
-          // 阅读状态栏
-          if (readingProvider.isReading) _buildReadingBar(c, readingProvider),
-          // 消息列表
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: _buildBgGradient(isDark, scheme),
-              ),
-              child: session == null || session.messages.isEmpty
-                  ? _buildEmptyState(isDark, c, readingProvider, scheme)
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      itemCount: session.messages.length,
-                      itemBuilder: (context, index) {
-                        return MessageBubble(
-                          message: session.messages[index],
-                          avatarUser: settings.avatarUser,
-                          avatarXia: settings.avatarXia,
-                          userBubbleColor: chatProvider.currentScheme.userBubbleColorObj,
-                          xiaBubbleColor: chatProvider.currentScheme.xiaBubbleColorObj,
-                          primaryColor: chatProvider.currentScheme.primaryColorObj,
-                          onDelete: () => chatProvider.deleteMessage(index),
-                          onRegenerate: () {
-                            if (session.messages.length > index + 1) {
-                              final userMsg = session.messages[index - 1];
-                              chatProvider.deleteMessage(index + 1);
-                              chatProvider.sendMessage(userMsg.content);
-                            }
-                          },
-                          onRead: () {
-                            // 朗读——先空着
-                          },
-                          onEdit: () {},
-                          onFavorite: () {},
-                          onShare: () {},
-                        );
-                      },
-                    ),
-            ),
-          ),
-          // Loading
-          chatProvider.isLoading
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: SizedBox(
-                    width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+              // ===== 聊天卡片 =====
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                  decoration: BoxDecoration(
+                    color: c.paper,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: c.shadow,
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                )
-              : const SizedBox.shrink(),
-          InputBar(
-            isStreaming: chatProvider.isStreaming,
-            referencedBook: chatProvider.referencedBook,
-            onSend: _handleSend,
-            onCancel: () => chatProvider.cancelStreaming(),
-            onClearReference: () => chatProvider.clearReferenceBook(),
+                  child: Column(
+                    children: [
+                      // 头像 + 状态区
+                      _buildChatProfile(c),
+                      const Divider(height: 1, color: Colors.transparent),
+
+                      // 消息列表
+                      Expanded(
+                        child: session == null || session.messages.isEmpty
+                            ? _buildEmptyState(isDark, c, readingProvider, scheme)
+                            : ListView.builder(
+                                controller: _scrollController,
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                itemCount: session.messages.length,
+                                itemBuilder: (context, index) {
+                                  final msg = session.messages[index];
+
+                                  // 日期分割
+                                  final widgets = <Widget>[];
+                                  if (index == 0 || _isNewDay(session.messages[index - 1].timestamp, msg.timestamp)) {
+                                    widgets.add(
+                                      _buildDateDivider(
+                                        _formatDate(msg.timestamp!),
+                                        c,
+                                      ),
+                                    );
+                                  }
+
+                                  widgets.add(MessageBubble(
+                                    message: msg,
+                                    avatarUser: settings.avatarUser,
+                                    avatarXia: settings.avatarXia,
+                                    userBubbleColor: scheme.userBubbleColorObj,
+                                    xiaBubbleColor: scheme.xiaBubbleColorObj,
+                                    primaryColor: scheme.primaryColorObj,
+                                    onDelete: () => chatProvider.deleteMessage(index),
+                                    onRegenerate: () {
+                                      if (session.messages.length > index + 1) {
+                                        final userMsg = session.messages[index - 1];
+                                        chatProvider.deleteMessage(index + 1);
+                                        chatProvider.sendMessage(userMsg.content);
+                                      }
+                                    },
+                                    onRead: () {},
+                                    onEdit: () {},
+                                    onFavorite: () {},
+                                    onShare: () {},
+                                  ));
+
+                                  return Column(children: widgets);
+                                },
+                              ),
+                      ),
+
+                      // Loading indicator
+                      if (chatProvider.isLoading)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          child: SizedBox(
+                            width: 18, height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+
+                      // 输入区
+                      InputBar(
+                        isStreaming: chatProvider.isStreaming,
+                        referencedBook: chatProvider.referencedBook,
+                        onSend: _handleSend,
+                        onCancel: () => chatProvider.cancelStreaming(),
+                        onClearReference: () => chatProvider.clearReferenceBook(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
+
+      // ===== 会话抽屉（保留） =====
+      drawer: _buildSessionDrawer(context, isDark, c, chatProvider, scheme),
     );
   }
 
-  // ---- 阅读状态栏 ----
-  Widget _buildReadingBar(MoonlitTheme c, ReadingProvider provider) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: c.accentLight,
-        border: Border(bottom: BorderSide(color: c.border, width: 0.5)),
-      ),
+  // ===== 顶栏 =====
+  Widget _buildHeader(MoonlitTheme c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
-          Icon(Icons.auto_stories_rounded, size: 16, color: c.accent),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              provider.progressText,
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: c.accent),
-              overflow: TextOverflow.ellipsis,
+          // X 关闭按钮（圆形描边）
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: c.border, width: 1.5),
+                color: c.paper,
+              ),
+              child: Icon(Icons.close_rounded, size: 18, color: c.inkSec),
             ),
           ),
-          const SizedBox(width: 4),
-          _MiniBtn(icon: Icons.chevron_left_rounded, onTap: provider.hasPrev ? provider.prevChapter : null, c: c),
-          const SizedBox(width: 2),
-          _MiniBtn(icon: Icons.chevron_right_rounded, onTap: provider.hasNext ? provider.nextChapter : null, c: c),
-          const SizedBox(width: 4),
+          const Spacer(),
+          // 标题 + 副标题
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '小月亮 · 月下窗',
+                style: TextStyle(
+                  fontFamily: 'Noto Serif SC',
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: c.ink,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              Text(
+                'xiayue.top',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: c.inkSec,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          // ... 菜单按钮（圆形描边）
           GestureDetector(
-            onTap: () {
-              provider.stopReading();
-              context.read<ChatProvider>().sendSystemMessage('已退出阅读模式～📖');
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Icon(Icons.close_rounded, size: 16, color: c.accent),
+            onTap: () => Scaffold.of(context).openDrawer(),
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: c.border, width: 1.5),
+                color: c.paper,
+              ),
+              child: Icon(Icons.more_horiz_rounded, size: 18, color: c.inkSec),
             ),
           ),
         ],
@@ -191,7 +244,85 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // ---- 空状态 ----
+  // ===== 聊天卡片顶部的头像 + 状态 =====
+  Widget _buildChatProfile(MoonlitTheme c) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Row(
+        children: [
+          // 弯月头像
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: c.accentLight,
+              border: Border.all(color: c.border, width: 1),
+            ),
+            child: Icon(Icons.circle_rounded, size: 22, color: c.gold),
+          ),
+          const SizedBox(width: 10),
+          // 名称 + 状态
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '小月亮·月下窗',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: c.ink,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '在线·月光正好',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: c.inkSec,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 右侧弯月图标
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: c.border, width: 1),
+              color: c.surface,
+            ),
+            child: Icon(Icons.circle_rounded, size: 16, color: c.gold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===== 日期分割线 =====
+  Widget _buildDateDivider(String text, MoonlitTheme c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: c.border, thickness: 0.5)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 12, color: c.inkSec),
+            ),
+          ),
+          Expanded(child: Divider(color: c.border, thickness: 0.5)),
+        ],
+      ),
+    );
+  }
+
+  // ===== 空状态 =====
   Widget _buildEmptyState(bool isDark, MoonlitTheme c, ReadingProvider readingProvider, ThemeScheme scheme) {
     if (readingProvider.isReading && readingProvider.currentChapter != null) {
       final ch = readingProvider.currentChapter!;
@@ -226,17 +357,29 @@ class _ChatPageState extends State<ChatPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline_rounded, size: 64, color: c.border),
+          Container(
+            width: 64, height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: c.accentLight,
+            ),
+            child: Icon(Icons.chat_bubble_outline_rounded, size: 32, color: c.accent),
+          ),
           const SizedBox(height: 16),
-          Text('开始与遐对话', style: TextStyle(fontSize: 18, color: c.inkSec)),
-          const SizedBox(height: 8),
-          Text('在下方输入消息，点击发送', style: TextStyle(fontSize: 14, color: c.border)),
+          Text('开始与遐对话', style: TextStyle(fontSize: 16, color: c.ink, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 6),
+          Text('说点什么吧，月下窗开着呢', style: TextStyle(fontSize: 13, color: c.inkSec)),
         ],
       ),
     );
   }
 
-  // ---- 背景渐变 ----
+  bool _isNewDay(DateTime? prev, DateTime? current) {
+    if (prev == null || current == null) return false;
+    return prev.year != current.year || prev.month != current.month || prev.day != current.day;
+  }
+
+  // ===== 背景渐变 =====
   RadialGradient _buildBgGradient(bool isDark, ThemeScheme scheme) {
     final bg = isDark ? scheme.darkBgColorObj : scheme.bgColorObj;
     final center = isDark
@@ -250,7 +393,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // ---- 会话抽屉 ----
+  // ===== 会话抽屉 =====
   Widget _buildSessionDrawer(BuildContext context, bool isDark, MoonlitTheme c, ChatProvider provider, ThemeScheme scheme) {
     return Drawer(
       backgroundColor: c.paper,
@@ -285,11 +428,10 @@ class _ChatPageState extends State<ChatPage> {
                     width: double.infinity,
                     child: TextButton.icon(
                       onPressed: () { provider.newSession(); Navigator.pop(context); },
-                      icon: const Icon(Icons.add_rounded, size: 18),
-                      label: const Text('新建对话'),
+                      icon: Icon(Icons.add_rounded, size: 18, color: c.accent),
+                      label: Text('新建对话', style: TextStyle(color: c.accent)),
                       style: TextButton.styleFrom(
                         backgroundColor: c.accentLight,
-                        foregroundColor: c.accent,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
@@ -302,15 +444,12 @@ class _ChatPageState extends State<ChatPage> {
                       onPressed: () async {
                         Navigator.pop(context);
                         final result = await Navigator.pushNamed(context, '/book');
-                        if (result != null && context.mounted) {
-                          // 用户从书库选了书，传入聊天作为引用
-                        }
+                        if (result != null && context.mounted) {}
                       },
-                      icon: const Icon(Icons.auto_stories_rounded, size: 18),
-                      label: const Text('我的书库'),
+                      icon: Icon(Icons.auto_stories_rounded, size: 18, color: c.warm),
+                      label: Text('我的书库', style: TextStyle(color: c.warm)),
                       style: TextButton.styleFrom(
                         backgroundColor: c.warm.withValues(alpha: 0.3),
-                        foregroundColor: c.warm,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
@@ -365,30 +504,6 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ---- 迷你按钮 ----
-class _MiniBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  final MoonlitTheme c;
-  const _MiniBtn({required this.icon, required this.onTap, required this.c});
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onTap != null;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 28, height: 28,
-        decoration: BoxDecoration(
-          color: enabled ? c.accentLight : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 16, color: enabled ? c.accent : c.border),
       ),
     );
   }

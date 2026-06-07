@@ -58,10 +58,7 @@ class _InputBarState extends State<InputBar> {
 
     return Container(
       decoration: BoxDecoration(
-        color: c.surface,
-        border: Border(
-          top: BorderSide(color: c.border, width: 0.5),
-        ),
+        color: c.paper,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -93,7 +90,7 @@ class _InputBarState extends State<InputBar> {
                           ? '正在回复...'
                           : (widget.referencedBook != null
                               ? '输入关于「${widget.referencedBook!.title}」的问题...'
-                              : '给遐发消息...'),
+                              : '说点什么...'),
                       hintStyle: TextStyle(color: c.inkSec),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
