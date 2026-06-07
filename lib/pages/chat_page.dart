@@ -275,7 +275,7 @@ class _ChatPageState extends State<ChatPage> {
                       );
                     },
                   ),
-          ),
+          )),
           // Loading indicator
           chatProvider.isLoading
               ? const Padding(
