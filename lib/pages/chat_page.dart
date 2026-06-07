@@ -95,9 +95,6 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: Column(
                     children: [
-                      // 头像 + 状态区
-                      _buildChatProfile(c),
-                      const Divider(height: 1, color: Colors.transparent),
 
                       // 消息列表
                       Expanded(
