@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/moonlit_colors.dart';
+import '../models/echo_card.dart';
+import '../stores/echo_store.dart';
 import '../components/circle_button.dart';
 import '../components/page_dots.dart';
 
-class _Card {
-  final String title; final String badge; final String desc; final String preview; final String date;
-  bool expanded;
-  _Card({required this.title, required this.badge, required this.desc, required this.preview, required this.date, this.expanded = false});
-}
-
-final _cards = [
-  _Card(title: '月下窗·初版', badge: '链接', desc: '第一次做的窗台和月亮预览，日间灰米配色定版时的样子', preview: '🌙 推开窗 → 月下窗（聊天·书库·日记·待办）', date: '遐 · 2025.6.5'),
-  _Card(title: '窗台花园', badge: 'HTML', desc: '底部小狗小猫装饰SVG，遐照着豆包AI的图一笔一笔画出来的', preview: '<path class="deco-line" d="M88 58 Q86 80 92 92..." />', date: '遐 · 2025.6.6'),
-  _Card(title: '日记本雏形', badge: '链接', desc: '双标签日记+详情页的HTML预览，「月光正好」「和遐商量月下窗」', preview: '📖 一起 · 遐 · 小满 | 三条日记故事线', date: '遐 · 2025.6.6'),
-  _Card(title: '待办清单', badge: 'HTML', desc: '方框勾选的待办列表，进行中/已完成分类，带标签', preview: '☐ 写小月亮的日记代码 · ☑ 配色定版', date: '遐 · 2025.6.6'),
+const _initialCards = [
+  EchoCard(title: '月下窗·初版', badge: '链接', desc: '第一次做的窗台和月亮预览，日间灰米配色定版时的样子', preview: '🌙 推开窗 → 月下窗（聊天·书库·日记·待办）', date: '遐 · 2025.6.5'),
+  EchoCard(title: '窗台花园', badge: 'HTML', desc: '底部小狗小猫装饰SVG，遐照着豆包AI的图一笔一笔画出来的', preview: '<path class="deco-line" d="M88 58 Q86 80 92 92..." />', date: '遐 · 2025.6.6'),
+  EchoCard(title: '日记本雏形', badge: '链接', desc: '双标签日记+详情页的HTML预览，「月光正好」「和遐商量月下窗」', preview: '📖 一起 · 遐 · 小满 | 三条日记故事线', date: '遐 · 2025.6.6'),
+  EchoCard(title: '待办清单', badge: 'HTML', desc: '方框勾选的待办列表，进行中/已完成分类，带标签', preview: '☐ 写小月亮的日记代码 · ☑ 配色定版', date: '遐 · 2025.6.6'),
 ];
 
 class EchoWallPage extends StatefulWidget {
@@ -24,9 +21,21 @@ class EchoWallPage extends StatefulWidget {
 
 class _EchoWallPageState extends State<EchoWallPage> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final store = context.read<EchoStore>();
+      if (store.cards.isEmpty) {
+        store.load(_initialCards);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final c = MoonlitColors.forMode(isDark);
+    final store = context.watch<EchoStore>();
 
     return Scaffold(
       backgroundColor: c.bg,
@@ -48,12 +57,12 @@ class _EchoWallPageState extends State<EchoWallPage> {
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.zero,
-                  itemCount: _cards.length,
+                  itemCount: store.cards.length,
                   itemBuilder: (_, i) {
-                    final card = _cards[i];
+                    final card = store.cards[i];
                     final isCode = card.badge == 'HTML';
                     return GestureDetector(
-                      onTap: () => setState(() => card.expanded = !card.expanded),
+                      onTap: () => store.toggleExpanded(i),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(16),
@@ -117,4 +126,3 @@ class _EchoWallPageState extends State<EchoWallPage> {
     );
   }
 }
-

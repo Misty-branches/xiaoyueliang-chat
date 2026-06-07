@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../pages/diary_page.dart'; // DiaryEntry 定义暂时还在这里
+import '../models/diary_entry.dart';
 
-/// 日记 Store —— 目前用静态数据，后续接服务器
+/// 日记数据管理
 class DiaryStore extends ChangeNotifier {
   List<DiaryEntry> _entries = [];
   int _tab = 0;

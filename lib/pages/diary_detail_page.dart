@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/moonlit_colors.dart';
-import 'diary_page.dart' show DiaryEntry;
+import '../models/diary_entry.dart';
 
 class DiaryDetailPage extends StatelessWidget {
   const DiaryDetailPage({super.key});

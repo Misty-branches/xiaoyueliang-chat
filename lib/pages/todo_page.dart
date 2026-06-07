@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/moonlit_colors.dart';
+import '../models/todo_item.dart';
+import '../stores/todo_store.dart';
 import '../components/circle_button.dart';
 import '../components/page_dots.dart';
 
-class _Item {
-  String title; String desc; String tag; bool done;
-  _Item({required this.title, required this.desc, required this.tag, this.done = false});
-}
-
-final _items = [
-  _Item(title: '写小月亮的日记代码', desc: '把日记+待办预览缝进Flutter里编译成APK', tag: '遐'),
-  _Item(title: '看《人间草木》第二章', desc: '今天读到「葡萄月令」那篇', tag: '小满'),
-  _Item(title: '选定倒计时墙的模板', desc: '在网站上找几个好看的样式一起挑', tag: '一起'),
-  _Item(title: '月下窗配色定版', desc: '日间灰米低饱和 + 夜间亮蓝高饱和，月亮日间哑金夜间亮金', tag: '一起', done: true),
-  _Item(title: '把微信通道跑通', desc: 'Hermes Gateway接微信，消息收发正常', tag: '遐', done: true),
+const _initialItems = [
+  TodoItem(title: '写小月亮的日记代码', desc: '把日记+待办预览缝进Flutter里编译成APK', tag: '遐'),
+  TodoItem(title: '看《人间草木》第二章', desc: '今天读到「葡萄月令」那篇', tag: '小满'),
+  TodoItem(title: '选定倒计时墙的模板', desc: '在网站上找几个好看的样式一起挑', tag: '一起'),
+  TodoItem(title: '月下窗配色定版', desc: '日间灰米低饱和 + 夜间亮蓝高饱和，月亮日间哑金夜间亮金', tag: '一起', done: true),
+  TodoItem(title: '把微信通道跑通', desc: 'Hermes Gateway接微信，消息收发正常', tag: '遐', done: true),
 ];
 
 class TodoPage extends StatefulWidget {
@@ -23,14 +21,24 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoPageState extends State<TodoPage> {
-  void _toggle(int i) => setState(() => _items[i].done = !_items[i].done);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final store = context.read<TodoStore>();
+      if (store.items.isEmpty) {
+        store.load(_initialItems);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final c = MoonlitColors.forMode(isDark);
-    final pending = _items.where((t) => !t.done).toList();
-    final done = _items.where((t) => t.done).toList();
+    final store = context.watch<TodoStore>();
+    final pending = store.pending;
+    final done = store.done;
 
     return Scaffold(
       backgroundColor: c.bg,
@@ -53,11 +61,21 @@ class _TodoPageState extends State<TodoPage> {
                 child: ListView(
                   children: [
                     _SecHdr(title: '进行中', count: pending.length, c: c),
-                    ...pending.asMap().entries.map((e) => _TodoCard(item: e.value, idx: _items.indexOf(e.value), c: c, onTap: () => _toggle(_items.indexOf(e.value)))),
+                    ...pending.asMap().entries.map((e) => _TodoCard(
+                      item: e.value,
+                      idx: store.items.indexOf(e.value),
+                      c: c,
+                      onTap: () => store.toggle(store.items.indexOf(e.value)),
+                    )),
                     if (done.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       _SecHdr(title: '已完成', count: done.length, c: c),
-                      ...done.asMap().entries.map((e) => _TodoCard(item: e.value, idx: _items.indexOf(e.value), c: c, onTap: () => _toggle(_items.indexOf(e.value)))),
+                      ...done.asMap().entries.map((e) => _TodoCard(
+                        item: e.value,
+                        idx: store.items.indexOf(e.value),
+                        c: c,
+                        onTap: () => store.toggle(store.items.indexOf(e.value)),
+                      )),
                     ],
                   ],
                 ),
@@ -80,7 +98,7 @@ class _SecHdr extends StatelessWidget {
 }
 
 class _TodoCard extends StatelessWidget {
-  final _Item item; final int idx; final MoonlitTheme c; final VoidCallback onTap;
+  final TodoItem item; final int idx; final MoonlitTheme c; final VoidCallback onTap;
   const _TodoCard({required this.item, required this.idx, required this.c, required this.onTap});
 
   Color _tagBg() => switch (item.tag) { '遐' => c.accentLight, '小满' => c.warm.withValues(alpha: 0.7), _ => c.warm.withValues(alpha: 0.6) };
@@ -129,4 +147,3 @@ class _TodoCard extends StatelessWidget {
     );
   }
 }
-

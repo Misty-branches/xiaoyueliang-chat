@@ -1,48 +1,30 @@
 import 'package:flutter/foundation.dart';
+import '../models/todo_item.dart';
 
-/// 待办 Store —— 目前用静态数据，后续接持久化
+/// 待办数据管理
 class TodoStore extends ChangeNotifier {
-  List<_TodoItem> _items = [];
+  List<TodoItem> _items = [];
 
-  List<_TodoItem> get items => _items;
-  List<_TodoItem> get pending => _items.where((t) => !t.done).toList();
-  List<_TodoItem> get done => _items.where((t) => t.done).toList();
+  List<TodoItem> get items => _items;
+  List<TodoItem> get pending => _items.where((t) => !t.done).toList();
+  List<TodoItem> get done => _items.where((t) => t.done).toList();
 
-  void load(List<_TodoItem> items) {
+  void load(List<TodoItem> items) {
     _items = items;
     notifyListeners();
   }
 
   void toggle(int index) {
     if (index >= 0 && index < _items.length) {
-      _items[index] = _TodoItem(
-        title: _items[index].title,
-        desc: _items[index].desc,
-        tag: _items[index].tag,
-        done: !_items[index].done,
-      );
+      _items[index] = _items[index].copyWith(done: !_items[index].done);
       notifyListeners();
     }
   }
 
-  void add(_TodoItem item) {
+  void add(TodoItem item) {
     _items.insert(0, item);
     notifyListeners();
   }
 
   // TODO: 后续接持久化
-}
-
-class _TodoItem {
-  final String title;
-  final String desc;
-  final String tag;
-  final bool done;
-
-  const _TodoItem({
-    required this.title,
-    required this.desc,
-    required this.tag,
-    this.done = false,
-  });
 }

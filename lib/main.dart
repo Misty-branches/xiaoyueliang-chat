@@ -13,6 +13,9 @@ import 'pages/diary_detail_page.dart';
 import 'pages/todo_page.dart';
 import 'pages/echo_wall_page.dart';
 import 'models/theme_scheme.dart';
+import 'stores/diary_store.dart';
+import 'stores/todo_store.dart';
+import 'stores/echo_store.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +25,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => BookProvider()),
         ChangeNotifierProvider(create: (_) => ReadingProvider()),
+        ChangeNotifierProvider(create: (_) => DiaryStore()),
+        ChangeNotifierProvider(create: (_) => TodoStore()),
+        ChangeNotifierProvider(create: (_) => EchoStore()),
       ],
       child: const XiayueChatApp(),
     ),

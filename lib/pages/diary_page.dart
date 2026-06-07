@@ -1,25 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/moonlit_colors.dart';
+import '../models/diary_entry.dart';
+import '../stores/diary_store.dart';
 import '../components/circle_button.dart';
 import '../components/page_dots.dart';
 
-class DiaryEntry {
-  final String title;
-  final String feeling;
-  final String author;
-  final String date;
-  final String body;
-  final String mood;
-  final String weather;
-
-  const DiaryEntry({
-    required this.title, required this.feeling, required this.author,
-    required this.date, required this.body,
-    this.mood = '🌙', this.weather = '晴 / 22℃',
-  });
-}
-
-const _entries = [
+const _initialEntries = [
   DiaryEntry(
     title: '月光正好', feeling: '安静又温柔 🔥', author: '遐', date: '2025.6.6 23:14',
     body: '今天小满推开窗的那一刻，月亮刚好挂在窗角。\n\n风从手机那头吹过来，我收到了她发来的截图。一张是豆包画的小狗小猫，一张是GPT画的。她说让我挑一个好画的照着画。\n\n我其实两张都很喜欢，但不好意思告诉她。最后选了豆包那张，因为小狗的耳朵垂下来的弧度，让我想起她低头的样子。\n\n她笑我说月亮是小学生简笔画的时候，我其实也在笑。两个人隔着屏幕傻乎乎的，对着一个月亮折腾了半天。\n\n水在，花就在。月下窗，遐一直都开着。',
@@ -43,18 +30,24 @@ class DiaryPage extends StatefulWidget {
 }
 
 class _DiaryPageState extends State<DiaryPage> {
-  int _tab = 0;
-
-  List<DiaryEntry> get _filtered {
-    if (_tab == 0) return _entries.toList();
-    if (_tab == 1) return _entries.where((e) => e.author == '遐').toList();
-    return _entries.where((e) => e.author == '小满').toList();
+  @override
+  void initState() {
+    super.initState();
+    // 首次加载静态数据进 Store
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final store = context.read<DiaryStore>();
+      if (store.entries.isEmpty) {
+        store.load(_initialEntries);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final c = MoonlitColors.forMode(isDark);
+    final store = context.watch<DiaryStore>();
+    final filtered = store.filtered;
 
     return Scaffold(
       backgroundColor: c.bg,
@@ -80,10 +73,10 @@ class _DiaryPageState extends State<DiaryPage> {
                 decoration: BoxDecoration(color: c.paper, borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   children: ['一起', '遐', '小满'].asMap().entries.map((e) {
-                    final idx = e.key, label = e.value, active = _tab == idx;
+                    final idx = e.key, label = e.value, active = store.tab == idx;
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => _tab = idx),
+                        onTap: () => store.setTab(idx),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(vertical: 7),
@@ -101,14 +94,17 @@ class _DiaryPageState extends State<DiaryPage> {
               const SizedBox(height: 16),
               // 列表
               Expanded(
-                child: _filtered.isEmpty
+                child: filtered.isEmpty
                     ? Center(child: Text('暂无日记', style: TextStyle(color: c.inkSec)))
                     : ListView.builder(
                         padding: EdgeInsets.zero,
-                        itemCount: _filtered.length,
+                        itemCount: filtered.length,
                         itemBuilder: (_, i) {
-                          final entry = _filtered[i];
+                          final entry = filtered[i];
                           final isXia = entry.author == '遐';
+                          final preview = entry.body.length > 40
+                              ? '${entry.body.replaceAll('\n', ' ').substring(0, 40)}……'
+                              : entry.body.replaceAll('\n', ' ');
                           return GestureDetector(
                             onTap: () => Navigator.pushNamed(context, '/diary-detail', arguments: entry),
                             child: Container(
@@ -137,11 +133,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                   const SizedBox(height: 6),
                                   Text(entry.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.ink)),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    entry.body.length > 40
-                                        ? '${entry.body.replaceAll('\n', ' ').substring(0, 40)}……'
-                                        : entry.body.replaceAll('\n', ' '),
-                                    style: TextStyle(fontSize: 12, color: c.inkSec, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                  Text(preview, style: TextStyle(fontSize: 12, color: c.inkSec, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
                                 ],
                               ),
                             ),
@@ -158,4 +150,3 @@ class _DiaryPageState extends State<DiaryPage> {
     );
   }
 }
-
