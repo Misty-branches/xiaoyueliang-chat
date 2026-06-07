@@ -20,14 +20,11 @@ class HubPage extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
 
-              // ---- 顶栏 ----
+              // ---- 顶栏（预览版布局：标题左，返回右） ----
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: c.inkSec),
-                  ),
+                  // 左侧：月下窗标题
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Text(
@@ -41,8 +38,23 @@ class HubPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // 右侧：返回 + 切换 + 设置
                   Row(
                     children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: c.border),
+                            color: c.paper,
+                          ),
+                          child: Center(child: Text('←', style: TextStyle(fontSize: 18, color: c.inkSec, height: 1))),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           final provider = context.read<ChatProvider>();

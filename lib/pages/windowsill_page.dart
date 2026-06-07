@@ -16,9 +16,9 @@ class WindowsillPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
 
-              // ---- 窗口 ----
+              // ---- 窗口 + 今日心情 ----
               GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/hub'),
                 child: Column(
@@ -76,11 +76,21 @@ class WindowsillPage extends StatelessWidget {
                         letterSpacing: 4,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    // 今日心情
+                    Text(
+                      '🌙 心情：安静又温柔',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: c.inkSec,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
               // ---- 活动卡片 ----
               Container(
@@ -157,11 +167,11 @@ class WindowsillPage extends StatelessWidget {
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 16),
 
-              // ---- SVG 装饰 ----
+              // ---- SVG 装饰（靠上一点，不会被推到看不见） ----
               SizedBox(
-                height: 100,
+                height: 80,
                 width: double.infinity,
                 child: CustomPaint(
                   painter: _DecoPainter(
@@ -173,7 +183,7 @@ class WindowsillPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
 
               // ---- 底部圆点 ----
               _PageDots(count: 4, active: 0, accent: c.accent, border: c.border),
