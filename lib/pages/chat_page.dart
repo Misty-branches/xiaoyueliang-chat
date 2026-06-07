@@ -277,15 +277,16 @@ class _ChatPageState extends State<ChatPage> {
                   ),
           ),
           // Loading indicator
-          if (chatProvider.isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
+          chatProvider.isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : const SizedBox.shrink(),
           InputBar(
             isStreaming: chatProvider.isStreaming,
             referencedBook: chatProvider.referencedBook,

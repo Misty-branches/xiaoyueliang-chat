@@ -6,6 +6,12 @@ import 'providers/reading_provider.dart';
 import 'pages/chat_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/book_page.dart';
+import 'pages/windowsill_page.dart';
+import 'pages/hub_page.dart';
+import 'pages/diary_page.dart';
+import 'pages/diary_detail_page.dart';
+import 'pages/todo_page.dart';
+import 'pages/echo_wall_page.dart';
 import 'models/theme_scheme.dart';
 
 void main() {
@@ -28,15 +34,15 @@ class XiayueChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 使用 Selector 监听主题版本号，只在主题变化时重建 MaterialApp
-    // 不会因为发消息/切换会话等操作触发全局重绘
     return Selector<ChatProvider, int>(
       selector: (_, provider) => provider.themeVersion,
       builder: (context, _, provider) {
-        final isDark = provider.settings.darkMode;
-        final scheme = provider.currentScheme;
+        final chatProv = provider!;
+        final isDark = chatProv.settings.darkMode;
+        final scheme = chatProv.currentScheme;
         final accentColor = scheme.primaryColorObj;
         return MaterialApp(
-          title: '遐悦聊天',
+          title: '遐悦',
           debugShowCheckedModeBanner: false,
           theme: _buildLightTheme(accentColor, scheme),
           darkTheme: _buildDarkTheme(accentColor, scheme),
@@ -46,6 +52,12 @@ class XiayueChatApp extends StatelessWidget {
             Widget page;
             switch (settings.name) {
               case '/':
+                page = const WindowsillPage();
+                break;
+              case '/hub':
+                page = const HubPage();
+                break;
+              case '/chat':
                 page = const ChatPage();
                 break;
               case '/settings':
@@ -54,8 +66,20 @@ class XiayueChatApp extends StatelessWidget {
               case '/book':
                 page = const BookPage();
                 break;
+              case '/diary':
+                page = const DiaryPage();
+                break;
+              case '/diary-detail':
+                page = const DiaryDetailPage();
+                break;
+              case '/todo':
+                page = const TodoPage();
+                break;
+              case '/echo':
+                page = const EchoWallPage();
+                break;
               default:
-                return null;
+                page = const WindowsillPage();
             }
             return _buildPageRoute(page);
           },
@@ -64,7 +88,7 @@ class XiayueChatApp extends StatelessWidget {
     );
   }
 
-  /// 页面切换动效：从右侧滑动 + 淡入，250ms easeOutCubic
+  /// 页面切换动效
   static PageRouteBuilder _buildPageRoute(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (_, __, ___) => page,
@@ -102,21 +126,14 @@ class XiayueChatApp extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      drawerTheme: DrawerThemeData(
-        backgroundColor: scheme.cardBgColorObj,
-      ),
       cardTheme: CardThemeData(
+        color: scheme.cardBgColorObj,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: scheme.primaryColorObj.withValues(alpha: 0.2), width: 0.5),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+      dividerTheme: const DividerThemeData(space: 1, thickness: 0.5),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
@@ -138,21 +155,14 @@ class XiayueChatApp extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      drawerTheme: DrawerThemeData(
-        backgroundColor: scheme.darkCardBgColorObj,
-      ),
       cardTheme: CardThemeData(
+        color: scheme.darkCardBgColorObj,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: scheme.primaryColorObj.withValues(alpha: 0.3), width: 0.5),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+      dividerTheme: const DividerThemeData(space: 1, thickness: 0.5),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
