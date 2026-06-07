@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/moonlit_colors.dart';
+import '../components/circle_button.dart';
+import '../components/page_dots.dart';
 
 class DiaryEntry {
   final String title;
@@ -66,7 +68,7 @@ class _DiaryPageState extends State<DiaryPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _CircleBtn(icon: Icons.arrow_back_ios_new_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () => Navigator.pop(context)),
+                  CircleButton(icon: Icons.arrow_back_ios_new_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () => Navigator.pop(context)),
                   Text('日 记', style: TextStyle(fontFamily: 'Noto Serif SC', fontSize: 17, fontWeight: FontWeight.w700, color: c.ink, letterSpacing: 1)),
                   const SizedBox(width: 36),
                 ],
@@ -135,7 +137,11 @@ class _DiaryPageState extends State<DiaryPage> {
                                   const SizedBox(height: 6),
                                   Text(entry.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.ink)),
                                   const SizedBox(height: 4),
-                                  Text(entry.body.replaceAll('\n', ' ').substring(0, 40) + '……', style: TextStyle(fontSize: 12, color: c.inkSec, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                  Text(
+                                    entry.body.length > 40
+                                        ? '${entry.body.replaceAll('\n', ' ').substring(0, 40)}……'
+                                        : entry.body.replaceAll('\n', ' '),
+                                    style: TextStyle(fontSize: 12, color: c.inkSec, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
                                 ],
                               ),
                             ),
@@ -143,7 +149,7 @@ class _DiaryPageState extends State<DiaryPage> {
                         },
                       ),
               ),
-              _Dots(count: 4, active: 2, accent: c.accent, border: c.border),
+              PageDots(count: 4, active: 2, accent: c.accent, border: c.border),
               const SizedBox(height: 16),
             ],
           ),
@@ -153,31 +159,3 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 }
 
-class _CircleBtn extends StatelessWidget {
-  final IconData icon; final Color color; final Color bg; final Color border; final VoidCallback onTap;
-  const _CircleBtn({required this.icon, required this.color, required this.bg, required this.border, required this.onTap});
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: border), color: bg), child: Icon(icon, size: 14, color: color)),
-    );
-  }
-}
-
-class _Dots extends StatelessWidget {
-  final int count; final int active; final Color accent; final Color border;
-  const _Dots({required this.count, required this.active, required this.accent, required this.border});
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(count, (i) => AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        width: i == active ? 18 : 5, height: 5,
-        decoration: BoxDecoration(color: i == active ? accent : border, borderRadius: BorderRadius.circular(3)),
-      )),
-    );
-  }
-}

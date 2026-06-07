@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/moonlit_colors.dart';
+import '../components/circle_button.dart';
+import '../components/page_dots.dart';
 
 class _Card {
   final String title; final String badge; final String desc; final String preview; final String date;
@@ -37,10 +39,7 @@ class _EchoWallPageState extends State<EchoWallPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: c.border), color: c.paper), child: Icon(Icons.arrow_back_ios_new_rounded, size: 14, color: c.inkSec)),
-                  ),
+                  CircleButton(icon: Icons.arrow_back_ios_new_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () => Navigator.pop(context)),
                   Text('回 音 墙', style: TextStyle(fontFamily: 'Noto Serif SC', fontSize: 17, fontWeight: FontWeight.w700, color: c.ink, letterSpacing: 1)),
                   const SizedBox(width: 36),
                 ],
@@ -109,7 +108,7 @@ class _EchoWallPageState extends State<EchoWallPage> {
                   },
                 ),
               ),
-              _DotsRow(count: 5, active: 4, accent: c.accent, border: c.border),
+              PageDots(count: 5, active: 4, accent: c.accent, border: c.border),
               const SizedBox(height: 16),
             ],
           ),
@@ -119,16 +118,3 @@ class _EchoWallPageState extends State<EchoWallPage> {
   }
 }
 
-class _DotsRow extends StatelessWidget {
-  final int count; final int active; final Color accent; final Color border;
-  const _DotsRow({required this.count, required this.active, required this.accent, required this.border});
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: List.generate(count, (i) => AnimatedContainer(
-      duration: const Duration(milliseconds: 300), margin: const EdgeInsets.symmetric(horizontal: 3),
-      width: i == active ? 18 : 5, height: 5,
-      decoration: BoxDecoration(color: i == active ? accent : border, borderRadius: BorderRadius.circular(3)),
-    )),
-  );
-}

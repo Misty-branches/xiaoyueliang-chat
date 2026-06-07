@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/moonlit_colors.dart';
+import '../components/circle_button.dart';
+import '../components/page_dots.dart';
 
 class _Item {
   String title; String desc; String tag; bool done;
@@ -41,9 +43,9 @@ class _TodoPageState extends State<TodoPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _CircleBtn(icon: Icons.arrow_back_ios_new_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () => Navigator.pop(context)),
+                  CircleButton(icon: Icons.arrow_back_ios_new_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () => Navigator.pop(context)),
                   Text('待 办 项 目', style: TextStyle(fontFamily: 'Noto Serif SC', fontSize: 17, fontWeight: FontWeight.w700, color: c.ink, letterSpacing: 1)),
-                  _CircleBtn(icon: Icons.edit_note_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () {}),
+                  CircleButton(icon: Icons.edit_note_rounded, color: c.inkSec, bg: c.paper, border: c.border, onTap: () {}),
                 ],
               ),
               const SizedBox(height: 20),
@@ -60,7 +62,7 @@ class _TodoPageState extends State<TodoPage> {
                   ],
                 ),
               ),
-              _RowDots(count: 4, active: 3, accent: c.accent, border: c.border),
+              PageDots(count: 4, active: 3, accent: c.accent, border: c.border),
               const SizedBox(height: 16),
             ],
           ),
@@ -68,13 +70,6 @@ class _TodoPageState extends State<TodoPage> {
       ),
     );
   }
-}
-
-class _CircleBtn extends StatelessWidget {
-  final IconData icon; final Color color; final Color bg; final Color border; final VoidCallback onTap;
-  const _CircleBtn({required this.icon, required this.color, required this.bg, required this.border, required this.onTap});
-  @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(width: 36, height: 36, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: border), color: bg), child: Icon(icon, size: 16, color: color)));
 }
 
 class _SecHdr extends StatelessWidget {
@@ -135,16 +130,3 @@ class _TodoCard extends StatelessWidget {
   }
 }
 
-class _RowDots extends StatelessWidget {
-  final int count; final int active; final Color accent; final Color border;
-  const _RowDots({required this.count, required this.active, required this.accent, required this.border});
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: List.generate(count, (i) => AnimatedContainer(
-      duration: const Duration(milliseconds: 300), margin: const EdgeInsets.symmetric(horizontal: 3),
-      width: i == active ? 18 : 5, height: 5,
-      decoration: BoxDecoration(color: i == active ? accent : border, borderRadius: BorderRadius.circular(3)),
-    )),
-  );
-}

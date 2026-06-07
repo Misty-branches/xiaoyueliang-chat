@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/message.dart';
+import '../models/moonlit_colors.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -279,10 +280,11 @@ class MessageBubble extends StatelessWidget {
   }
 
   void _showMessageMenu(BuildContext context, bool isDark) {
-    final bgColor = isDark ? const Color(0xFF2D2D2D) : const Color(0xFFF2F4F7);
-    final cardColor = isDark ? const Color(0xFF3A3A3A) : Colors.white;
-    final textColor = isDark ? Colors.grey.shade200 : Colors.black87;
-    final iconColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final c = MoonlitColors.forMode(isDark);
+    final bgColor = c.surface;
+    final cardColor = c.paper;
+    final textColor = c.ink;
+    final iconColor = c.inkSec;
     final deleteColor = const Color(0xFFE88080);
     showModalBottomSheet(
       context: context,

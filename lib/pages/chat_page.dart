@@ -67,7 +67,7 @@ class _ChatPageState extends State<ChatPage> {
       backgroundColor: Colors.transparent,
       body: Container(
         decoration: BoxDecoration(
-          gradient: _buildBgGradient(isDark, scheme),
+          gradient: _buildBgGradient(isDark, c),
         ),
         child: SafeArea(
           top: false,
@@ -115,7 +115,7 @@ class _ChatPageState extends State<ChatPage> {
                                   if (index == 0 || _isNewDay(session.messages[index - 1].timestamp, msg.timestamp)) {
                                     widgets.add(
                                       _buildDateDivider(
-                                        _formatDate(msg.timestamp!),
+                                        _formatDate(msg.timestamp),
                                         c,
                                       ),
                                     );
@@ -130,9 +130,9 @@ class _ChatPageState extends State<ChatPage> {
                                     primaryColor: scheme.primaryColorObj,
                                     onDelete: () => chatProvider.deleteMessage(index),
                                     onRegenerate: () {
-                                      if (session.messages.length > index + 1) {
+                                      if (index > 0 && session.messages.length > index) {
                                         final userMsg = session.messages[index - 1];
-                                        chatProvider.deleteMessage(index + 1);
+                                        chatProvider.deleteMessage(index);
                                         chatProvider.sendMessage(userMsg.content);
                                       }
                                     },
@@ -215,7 +215,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
               Text(
-                'xiayue.top',
+                ' 在线 · 月光正好',
                 style: TextStyle(
                   fontSize: 11,
                   color: c.inkSec,
@@ -380,15 +380,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // ===== 背景渐变 =====
-  RadialGradient _buildBgGradient(bool isDark, ThemeScheme scheme) {
-    final bg = isDark ? scheme.darkBgColorObj : scheme.bgColorObj;
-    final center = isDark
-        ? Color.lerp(bg, Colors.white, 0.06)!
-        : Color.lerp(bg, Colors.white, 0.12)!;
+  RadialGradient _buildBgGradient(bool isDark, MoonlitTheme c) {
     return RadialGradient(
       center: Alignment.center,
       radius: 1.3,
-      colors: [center, bg],
+      colors: [c.surface, c.bg],
       stops: const [0.0, 1.0],
     );
   }
