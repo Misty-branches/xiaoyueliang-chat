@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../models/settings.dart';
 import '../models/theme_scheme.dart';
+import '../models/moonlit_colors.dart';
 import '../providers/chat_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -84,15 +85,16 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final c = MoonlitColors.forMode(isDark);
     final cs = Theme.of(context).colorScheme;
     final provider = context.watch<ChatProvider>();
     final settings = provider.settings;
     final scheme = provider.currentScheme;
 
     return Scaffold(
-      backgroundColor: isDark ? scheme.darkBgColorObj : scheme.bgColorObj,
+      backgroundColor: c.bg,
       appBar: AppBar(
-        backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
+        backgroundColor: c.surface,
         elevation: 0,
         title: const Text('设置'),
         actions: [
@@ -106,7 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16),
         children: [
           _buildSection(
-            isDark, scheme,
+            isDark,
             'API 配置',
             [
               _buildTextField(
@@ -115,7 +117,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'http://你的服务器地址:8642',
                 icon: Icons.link_rounded,
                 isDark: isDark,
-                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -124,7 +125,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'sk-...',
                 icon: Icons.vpn_key_rounded,
                 isDark: isDark,
-                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -133,7 +133,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'deepseek-v4-flash',
                 icon: Icons.memory_rounded,
                 isDark: isDark,
-                scheme: scheme,
               ),
               const SizedBox(height: 12),
               _buildTextField(
@@ -142,18 +141,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 hint: 'http://你的服务器地址:8643',
                 icon: Icons.cloud_rounded,
                 isDark: isDark,
-                scheme: scheme,
               ),
               if (provider.cloudConnected)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 14, color: Colors.green.shade500),
+                      Icon(Icons.check_circle_rounded, size: 14, color: c.accent),
                       const SizedBox(width: 6),
                       Text(
                         '云端已连接',
-                        style: TextStyle(fontSize: 12, color: Colors.green.shade500),
+                        style: TextStyle(fontSize: 12, color: c.accent),
                       ),
                     ],
                   ),
@@ -162,7 +160,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark, scheme,
+            isDark,
             '生成参数',
             [
               _buildSlider(
@@ -190,7 +188,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark, scheme,
+            isDark,
             '系统提示词',
             [
               TextField(
@@ -198,7 +196,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 maxLines: 5,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? Colors.grey.shade200 : Colors.black87,
+                  color: c.ink,
                 ),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
@@ -206,10 +204,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor: isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.7) : scheme.cardBgColorObj.withValues(alpha: 0.7),
+                  fillColor: c.paper.withValues(alpha: 0.7),
                   hintText: '输入系统提示词...',
                   hintStyle: TextStyle(
-                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                    color: c.inkSec,
                   ),
                 ),
               ),
@@ -217,16 +215,16 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _buildSection(
-            isDark, scheme,
+            isDark,
             '主题装扮',
             [
               // 配色方案选择
               _buildSchemeSelector(isDark, cs),
               const SizedBox(height: 16),
               // 头像
-              Text('头像', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+              Text('头像', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: c.inkSec)),
               const SizedBox(height: 10),
-              _buildAvatarRow(cs, isDark),
+              _buildAvatarRow(c, isDark),
               const SizedBox(height: 16),
               // 深色模式
               SwitchListTile(
@@ -234,14 +232,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 title: Text(
                   '深色模式',
                   style: TextStyle(
-                    color: isDark ? Colors.grey.shade200 : Colors.black87,
+                    color: c.ink,
                   ),
                 ),
                 value: settings.darkMode,
                 onChanged: (v) {
                   provider.updateSettings(settings.copyWith(darkMode: v));
                 },
-                activeColor: cs.primary,
+                activeColor: c.accent,
               ),
             ],
           ),
@@ -259,7 +257,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 side: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                  color: c.border,
                 ),
               ),
             ),
@@ -270,7 +268,7 @@ class _SettingsPageState extends State<SettingsPage> {
               '遐悦聊天 v1.0.0',
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                color: c.inkSec,
               ),
             ),
           ),
@@ -311,9 +309,9 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Widget _buildSection(bool isDark, ThemeScheme scheme, String title, List<Widget> children) {
-    final cardBg = isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj;
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.grey.shade200;
+  Widget _buildSection(bool isDark, String title, List<Widget> children) {
+    final c = MoonlitColors.forMode(isDark);
+    final borderColor = c.border.withValues(alpha: isDark ? 0.4 : 0.6);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -324,7 +322,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.grey.shade400 : scheme.primaryColorObj.withValues(alpha: 0.7),
+              color: c.accent.withValues(alpha: 0.7),
               letterSpacing: 0.5,
             ),
           ),
@@ -332,7 +330,7 @@ class _SettingsPageState extends State<SettingsPage> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: cardBg,
+            color: c.paper,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: borderColor,
@@ -354,48 +352,46 @@ class _SettingsPageState extends State<SettingsPage> {
     required String hint,
     required IconData icon,
     required bool isDark,
-    ThemeScheme? scheme,
   }) {
+    final c = MoonlitColors.forMode(isDark);
     return TextField(
       controller: controller,
       style: TextStyle(
         fontSize: 15,
-        color: isDark ? Colors.grey.shade200 : Colors.black87,
+        color: c.ink,
       ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon, size: 20),
         labelStyle: TextStyle(
-          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+          color: c.inkSec,
         ),
         hintStyle: TextStyle(
-          color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+          color: c.inkSec,
           fontSize: 13,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+            color: c.border,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+            color: c.border,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
+            color: c.accent,
             width: 1.5,
           ),
         ),
         filled: true,
-        fillColor: scheme != null
-            ? (isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.7) : scheme.cardBgColorObj.withValues(alpha: 0.7))
-            : (isDark ? Colors.grey.shade800 : Colors.grey.shade50),
+        fillColor: c.paper.withValues(alpha: 0.7),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
@@ -411,6 +407,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required String displayValue,
     required ValueChanged<double> onChanged,
   }) {
+    final c = MoonlitColors.forMode(isDark);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -421,7 +418,7 @@ class _SettingsPageState extends State<SettingsPage> {
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                color: c.inkSec,
               ),
             ),
             Text(
@@ -429,7 +426,7 @@ class _SettingsPageState extends State<SettingsPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
+                color: c.accent,
               ),
             ),
           ],
@@ -439,8 +436,8 @@ class _SettingsPageState extends State<SettingsPage> {
           min: min,
           max: max,
           divisions: divisions,
-          activeColor: Theme.of(context).colorScheme.primary,
-          inactiveColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+          activeColor: c.accent,
+          inactiveColor: c.border,
           onChanged: onChanged,
         ),
       ],
@@ -449,11 +446,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// 配色方案选择器 — 卡片式，每行两个
   Widget _buildSchemeSelector(bool isDark, ColorScheme cs) {
+    final c = MoonlitColors.forMode(isDark);
     final schemes = ThemeScheme.presets;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('配色方案', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+        Text('配色方案', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: c.inkSec)),
         const SizedBox(height: 10),
         Wrap(
           spacing: 10,
@@ -469,10 +467,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: (MediaQuery.of(context).size.width - 52) / 2 - 5,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? scheme.darkCardBgColorObj : Colors.grey.shade50,
+                  color: c.paper,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? primaryColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    color: isSelected ? primaryColor : c.border,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -482,9 +480,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     // 颜色预览 — 三个小圆点
                     Row(
                       children: [
-                        Container(width: 16, height: 16, decoration: BoxDecoration(color: userColor, shape: BoxShape.circle, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, width: 0.5))),
+                        Container(width: 16, height: 16, decoration: BoxDecoration(color: userColor, shape: BoxShape.circle, border: Border.all(color: c.border, width: 0.5))),
                         const SizedBox(width: 6),
-                        Container(width: 16, height: 16, decoration: BoxDecoration(color: xiaColor, shape: BoxShape.circle, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, width: 0.5))),
+                        Container(width: 16, height: 16, decoration: BoxDecoration(color: xiaColor, shape: BoxShape.circle, border: Border.all(color: c.border, width: 0.5))),
                         const SizedBox(width: 6),
                         Container(width: 16, height: 16, decoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle)),
                       ],
@@ -493,12 +491,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     // 方案名称 + 选中标记
                     Row(
                       children: [
-                        Expanded(child: Text(scheme.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.grey.shade200 : Colors.black87), overflow: TextOverflow.ellipsis)),
+                        Expanded(child: Text(scheme.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: c.ink), overflow: TextOverflow.ellipsis)),
                         if (isSelected) Icon(Icons.check_circle, size: 16, color: primaryColor),
                       ],
                     ),
                     const SizedBox(height: 2),
-                    Text(scheme.description, style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(scheme.description, style: TextStyle(fontSize: 11, color: c.inkSec), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -510,19 +508,19 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   /// 头像选择行
-  Widget _buildAvatarRow(ColorScheme cs, bool isDark) {
+  Widget _buildAvatarRow(MoonlitTheme c, bool isDark) {
     return Row(
       children: [
         Expanded(child: Column(children: [
-          _buildAvatarPreview(base64Str: _avatarUser, fallbackText: '满', bgColor: cs.primary.withValues(alpha: 0.2), accentColor: cs.primary, isDark: isDark),
+          _buildAvatarPreview(base64Str: _avatarUser, fallbackText: '满', bgColor: c.accent.withValues(alpha: 0.2), accentColor: c.accent, isDark: isDark),
           const SizedBox(height: 6),
-          Text('我的头像', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+          Text('我的头像', style: TextStyle(fontSize: 11, color: c.inkSec)),
         ])),
         const SizedBox(width: 16),
         Expanded(child: Column(children: [
-          _buildAvatarPreview(base64Str: _avatarXia, fallbackText: '遐', bgColor: cs.primary.withValues(alpha: 0.2), accentColor: cs.primary, isDark: isDark),
+          _buildAvatarPreview(base64Str: _avatarXia, fallbackText: '遐', bgColor: c.accent.withValues(alpha: 0.2), accentColor: c.accent, isDark: isDark),
           const SizedBox(height: 6),
-          Text('遐的头像', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+          Text('遐的头像', style: TextStyle(fontSize: 11, color: c.inkSec)),
         ])),
       ],
     );
@@ -530,11 +528,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   /// 头像预览 + 点击更换
   Widget _buildAvatarPreview({required String base64Str, required String fallbackText, required Color bgColor, required Color accentColor, required bool isDark}) {
+    final c = MoonlitColors.forMode(isDark);
     return GestureDetector(
       onTap: () => _pickImage(base64Str == _avatarUser),
       child: Container(
         width: 64, height: 64,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor, border: Border.all(color: isDark ? Colors.grey.shade600 : Colors.grey.shade300)),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor, border: Border.all(color: c.border)),
         child: ClipOval(
           child: base64Str.isNotEmpty
               ? Image.memory(base64Decode(base64Str), fit: BoxFit.cover)

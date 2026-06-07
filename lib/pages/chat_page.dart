@@ -66,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
         scrolledUnderElevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: c.inkSec),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/hub', (route) => false),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           readingProvider.isReading

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/book_provider.dart';
 import '../providers/chat_provider.dart';
 import '../models/book.dart';
-import '../models/theme_scheme.dart';
+import '../models/moonlit_colors.dart';
 
 class BookPage extends StatefulWidget {
   const BookPage({super.key});
@@ -16,18 +16,21 @@ class _BookPageState extends State<BookPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final c = MoonlitColors.forMode(isDark);
     final bookProvider = context.watch<BookProvider>();
-    final scheme = context.watch<ChatProvider>().currentScheme;
     final books = bookProvider.books;
 
     return Scaffold(
-      backgroundColor: isDark ? scheme.darkBgColorObj : scheme.bgColorObj,
+      backgroundColor: c.bg,
       appBar: AppBar(
-        backgroundColor: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
+        backgroundColor: c.surface,
         elevation: 0,
         title: Row(
           children: [
-            const Text('我的书库'),
+            Text(
+              '我的书库',
+              style: TextStyle(color: c.ink),
+            ),
             if (books.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 8),
@@ -35,7 +38,7 @@ class _BookPageState extends State<BookPage> {
                   '(${books.length})',
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
+                    color: c.inkSec,
                   ),
                 ),
               ),
@@ -44,15 +47,15 @@ class _BookPageState extends State<BookPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddBookSheet(context, isDark),
-        backgroundColor: isDark ? Colors.blue.shade600 : Colors.blue.shade500,
+        backgroundColor: c.accent,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text('添加书籍', style: TextStyle(color: Colors.white)),
       ),
-      body: books.isEmpty ? _buildEmptyState(isDark) : _buildBookList(isDark, books, bookProvider),
+      body: books.isEmpty ? _buildEmptyState(c) : _buildBookList(c, books, bookProvider),
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState(MoonlitTheme c) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +63,7 @@ class _BookPageState extends State<BookPage> {
           Icon(
             Icons.menu_book_rounded,
             size: 72,
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+            color: c.border,
           ),
           const SizedBox(height: 16),
           Text(
@@ -68,7 +71,7 @@ class _BookPageState extends State<BookPage> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
+              color: c.inkSec,
             ),
           ),
           const SizedBox(height: 8),
@@ -76,7 +79,7 @@ class _BookPageState extends State<BookPage> {
             '点击下方按钮添加小说或文本',
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+              color: c.inkSec.withValues(alpha: 0.65),
             ),
           ),
         ],
@@ -84,7 +87,7 @@ class _BookPageState extends State<BookPage> {
     );
   }
 
-  Widget _buildBookList(bool isDark, List<Book> books, BookProvider provider) {
+  Widget _buildBookList(MoonlitTheme c, List<Book> books, BookProvider provider) {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
       itemCount: books.length,
@@ -92,7 +95,7 @@ class _BookPageState extends State<BookPage> {
         final book = books[index];
         return _BookCard(
           book: book,
-          isDark: isDark,
+          c: c,
           onQuote: () => Navigator.pop(context, book),
           onDelete: () => _confirmDelete(context, provider, book),
         );
@@ -101,15 +104,19 @@ class _BookPageState extends State<BookPage> {
   }
 
   void _confirmDelete(BuildContext context, BookProvider provider, Book book) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final c = MoonlitColors.forMode(isDark);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: c.paper,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('删除书籍'),
-        content: Text('确定要删除「${book.title}」吗？'),
+        title: Text('删除书籍', style: TextStyle(color: c.ink)),
+        content: Text('确定要删除「${book.title}」吗？', style: TextStyle(color: c.inkSec)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(foregroundColor: c.inkSec),
             child: const Text('取消'),
           ),
           TextButton(
@@ -117,7 +124,7 @@ class _BookPageState extends State<BookPage> {
               provider.removeBook(book.id);
               Navigator.pop(ctx);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: c.warm),
             child: const Text('删除'),
           ),
         ],
@@ -145,14 +152,16 @@ class _BookPageState extends State<BookPage> {
   }
 
   void _showTextInputDialog(BuildContext context, bool isDark) {
+    final c = MoonlitColors.forMode(isDark);
     final titleController = TextEditingController();
     final contentController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: c.paper,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('粘贴文本'),
+        title: Text('粘贴文本', style: TextStyle(color: c.ink)),
         content: SizedBox(
           width: double.maxFinite,
           child: Column(
@@ -160,26 +169,54 @@ class _BookPageState extends State<BookPage> {
             children: [
               TextField(
                 controller: titleController,
+                style: TextStyle(color: c.ink),
                 decoration: InputDecoration(
                   labelText: '书名',
+                  labelStyle: TextStyle(color: c.inkSec),
                   hintText: '输入书名...',
+                  hintStyle: TextStyle(color: c.inkSec.withValues(alpha: 0.6)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.accent, width: 2),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  fillColor: c.surface,
+                  filled: true,
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: contentController,
                 maxLines: 8,
+                style: TextStyle(color: c.ink),
                 decoration: InputDecoration(
                   labelText: '文本内容',
+                  labelStyle: TextStyle(color: c.inkSec),
                   hintText: '粘贴或输入小说内容...',
+                  hintStyle: TextStyle(color: c.inkSec.withValues(alpha: 0.6)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: c.accent, width: 2),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  fillColor: c.surface,
+                  filled: true,
                 ),
               ),
             ],
@@ -188,6 +225,7 @@ class _BookPageState extends State<BookPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(foregroundColor: c.inkSec),
             child: const Text('取消'),
           ),
           FilledButton(
@@ -199,7 +237,8 @@ class _BookPageState extends State<BookPage> {
               }
               Navigator.pop(ctx);
             },
-            child: const Text('添加'),
+            style: FilledButton.styleFrom(backgroundColor: c.accent),
+            child: Text('添加', style: TextStyle(color: c.ink)),
           ),
         ],
       ),
@@ -213,13 +252,13 @@ class _BookPageState extends State<BookPage> {
 
 class _BookCard extends StatelessWidget {
   final Book book;
-  final bool isDark;
+  final MoonlitTheme c;
   final VoidCallback onQuote;
   final VoidCallback onDelete;
 
   const _BookCard({
     required this.book,
-    required this.isDark,
+    required this.c,
     required this.onQuote,
     required this.onDelete,
   });
@@ -229,7 +268,6 @@ class _BookCard extends StatelessWidget {
     // Estimate character count excluding whitespace
     final charCount = book.content.replaceAll(RegExp(r'\s+'), '').length;
     final wordCount = book.content.split(RegExp(r'\s+')).length;
-    final scheme = context.read<ChatProvider>().currentScheme;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -237,11 +275,11 @@ class _BookCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: isDark ? scheme.darkCardBgColorObj.withValues(alpha: 0.5) : Colors.grey.shade200,
+          color: c.border,
           width: 0.5,
         ),
       ),
-      color: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
+      color: c.paper,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onQuote,
@@ -257,12 +295,12 @@ class _BookCard extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.amber.shade800.withValues(alpha: 0.2) : Colors.amber.shade50,
+                      color: c.gold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.auto_stories_rounded,
-                      color: isDark ? Colors.amber.shade300 : Colors.amber.shade700,
+                      color: c.gold,
                       size: 22,
                     ),
                   ),
@@ -276,7 +314,7 @@ class _BookCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.grey.shade200 : Colors.black87,
+                            color: c.ink,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -285,7 +323,7 @@ class _BookCard extends StatelessWidget {
                           '$charCount 字 · 约 $wordCount 词',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                            color: c.inkSec,
                           ),
                         ),
                       ],
@@ -295,7 +333,7 @@ class _BookCard extends StatelessWidget {
                   _ActionButton(
                     icon: Icons.format_quote_rounded,
                     label: '引用',
-                    color: isDark ? Colors.blue.shade300 : Colors.blue.shade600,
+                    color: c.accent,
                     onTap: onQuote,
                   ),
                   const SizedBox(width: 4),
@@ -303,7 +341,7 @@ class _BookCard extends StatelessWidget {
                   _ActionButton(
                     icon: Icons.delete_outline_rounded,
                     label: '',
-                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                    color: c.inkSec,
                     onTap: onDelete,
                   ),
                 ],
@@ -315,7 +353,7 @@ class _BookCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    color: c.accentLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -323,7 +361,7 @@ class _BookCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color: c.inkSec,
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -393,11 +431,11 @@ class _AddBookSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.read<ChatProvider>().currentScheme;
+    final c = MoonlitColors.forMode(isDark);
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 32),
       decoration: BoxDecoration(
-        color: isDark ? scheme.darkCardBgColorObj : scheme.cardBgColorObj,
+        color: c.paper,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -408,14 +446,14 @@ class _AddBookSheet extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+              color: c.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             '添加书籍',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: c.ink),
           ),
           const SizedBox(height: 24),
           ListTile(
@@ -423,36 +461,36 @@ class _AddBookSheet extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: isDark ? Colors.blue.shade800.withValues(alpha: 0.2) : Colors.blue.shade50,
+                color: c.accent.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 Icons.content_paste_rounded,
-                color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
+                color: c.accent,
               ),
             ),
-            title: const Text('粘贴文本'),
-            subtitle: const Text('复制小说内容，直接粘贴进来'),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            title: Text('粘贴文本', style: TextStyle(color: c.ink)),
+            subtitle: Text('复制小说内容，直接粘贴进来', style: TextStyle(color: c.inkSec)),
+            trailing: Icon(Icons.chevron_right_rounded, color: c.inkSec),
             onTap: onAddByText,
           ),
-          const Divider(indent: 72, endIndent: 16),
+          Divider(color: c.border, indent: 72, endIndent: 16),
           ListTile(
             leading: Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: isDark ? Colors.green.shade800.withValues(alpha: 0.2) : Colors.green.shade50,
+                color: c.gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 Icons.file_upload_outlined,
-                color: isDark ? Colors.green.shade300 : Colors.green.shade700,
+                color: c.gold,
               ),
             ),
-            title: const Text('上传文件'),
-            subtitle: const Text('支持 .txt 格式'),
-            trailing: const Icon(Icons.chevron_right_rounded),
+            title: Text('上传文件', style: TextStyle(color: c.ink)),
+            subtitle: Text('支持 .txt 格式', style: TextStyle(color: c.inkSec)),
+            trailing: Icon(Icons.chevron_right_rounded, color: c.inkSec),
             onTap: onAddByFile,
           ),
         ],
