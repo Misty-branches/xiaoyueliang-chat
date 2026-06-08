@@ -7,14 +7,14 @@ class TodoItem {
   final bool done;
   final DateTime createdAt;
 
-  const TodoItem({
-    required this.id,
+  TodoItem({
+    this.id = '',
     required this.title,
     required this.desc,
     required this.tag,
     this.done = false,
-    required this.createdAt,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   /// 从JSON反序列化
   factory TodoItem.fromJson(Map<String, dynamic> json) => TodoItem(

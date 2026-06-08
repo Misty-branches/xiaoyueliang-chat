@@ -92,4 +92,12 @@ class DiaryStore extends ChangeNotifier {
       return null;
     }
   }
+
+  /// 加载初始数据（仅在列表为空时）
+  void load(List<DiaryEntry> items) {
+    if (_entries.isEmpty) {
+      _entries = List.from(items);
+      notifyListeners();
+    }
+  }
 }

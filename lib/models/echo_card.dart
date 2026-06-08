@@ -9,7 +9,7 @@ class EchoCard {
   final bool expanded;
 
   const EchoCard({
-    required this.id,
+    this.id = ,
     required this.title,
     required this.badge,
     required this.desc,

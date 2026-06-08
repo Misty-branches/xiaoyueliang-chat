@@ -137,7 +137,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                       child: Text(entry.author, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: isXia ? c.accent : c.ink)),
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(entry.date.substring(0, 7), style: TextStyle(fontSize: 10, color: c.inkSec, letterSpacing: 0.3)),
+                                    Text(entry.date, style: TextStyle(fontSize: 10, color: c.inkSec, letterSpacing: 0.3)),
                                   ]),
                                   const SizedBox(height: 6),
                                   Text(entry.title, style: TextStyle(fontFamily: 'Noto Serif SC', fontSize: 15, fontWeight: FontWeight.w600, color: c.ink)),
