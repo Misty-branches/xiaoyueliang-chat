@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/book_provider.dart';
 import 'providers/reading_provider.dart';
+import 'providers/windowsill_provider.dart';
 import 'pages/chat_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/book_page.dart';
@@ -28,6 +29,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => DiaryStore()),
         ChangeNotifierProvider(create: (_) => TodoStore()),
         ChangeNotifierProvider(create: (_) => EchoStore()),
+        ChangeNotifierProvider(create: (_) => WindowsillProvider()),
       ],
       child: const XiayueChatApp(),
     ),
