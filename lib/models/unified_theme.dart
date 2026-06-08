@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'moonlit_colors.dart';
+export 'moonlit_colors.dart';
 
 /// 统一配色系统
 /// 结合 ThemeScheme（多套配色）和 MoonlitColors（日间/夜间）的优点

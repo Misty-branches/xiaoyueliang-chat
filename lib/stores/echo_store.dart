@@ -70,4 +70,12 @@ class EchoStore extends ChangeNotifier {
     notifyListeners();
     await _save();
   }
+
+  /// 加载初始数据（仅在列表为空时）
+  void load(List<EchoCard> items) {
+    if (_cards.isEmpty) {
+      _cards = List.from(items);
+      notifyListeners();
+    }
+  }
 }

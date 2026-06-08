@@ -80,4 +80,12 @@ class TodoStore extends ChangeNotifier {
     notifyListeners();
     await _save();
   }
+
+  /// 加载初始数据（仅在列表为空时）
+  void load(List<TodoItem> items) {
+    if (_items.isEmpty) {
+      _items = List.from(items);
+      notifyListeners();
+    }
+  }
 }
