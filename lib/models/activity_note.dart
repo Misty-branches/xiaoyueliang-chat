@@ -43,6 +43,34 @@ class ActivityNote {
            date.day == now.day;
   }
 
+  /// 作者（固定为遐，因为是遐的便签）
+  String get author => '遐';
+
+  /// 时间标签（如"下午 · 14:32"）
+  String get timeLabel {
+    final hour = date.hour;
+    String period;
+    if (hour < 6) period = '深夜';
+    else if (hour < 11) period = '上午';
+    else if (hour < 14) period = '中午';
+    else if (hour < 18) period = '下午';
+    else period = '晚上';
+    return '$period · ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// 心情标签（根据tag推断）
+  String get moodTag {
+    switch (tag) {
+      case 'reading': return '月光正好，风也温柔。';
+      case 'organizing': return '收拾完了，等你来看。';
+      case 'thinking': return '想着想着就笑了。';
+      case 'waiting': return '灯还亮着呢。';
+      case 'cooking': return '厨房里有家的味道。';
+      case 'walking': return '风很舒服。';
+      default: return '';
+    }
+  }
+
   /// 标签对应的emoji
   String get tagEmoji {
     switch (tag) {

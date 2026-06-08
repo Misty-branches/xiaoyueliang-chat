@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'moonlit_colors.dart';
 
 /// 统一配色系统
 /// 结合 ThemeScheme（多套配色）和 MoonlitColors（日间/夜间）的优点
@@ -356,36 +357,26 @@ class UnifiedTheme {
 }
 
 /// 当前主题的颜色集合（根据日间/夜间模式）
-class UnifiedThemeColors {
-  final Color bg;
-  final Color surface;
-  final Color paper;
-  final Color ink;
-  final Color inkSec;
-  final Color accent;
-  final Color accentLight;
-  final Color border;
-  final Color warm;
-  final Color gold;
-  final Color shadow;
+/// 继承 MoonlitTheme 以保持向后兼容
+class UnifiedThemeColors extends MoonlitTheme {
   final Color userBubble;
   final Color xiaBubble;
   final bool isDark;
 
   const UnifiedThemeColors({
-    required this.bg,
-    required this.surface,
-    required this.paper,
-    required this.ink,
-    required this.inkSec,
-    required this.accent,
-    required this.accentLight,
-    required this.border,
-    required this.warm,
-    required this.gold,
-    required this.shadow,
+    required super.bg,
+    required super.surface,
+    required super.paper,
+    required super.ink,
+    required super.inkSec,
+    required super.accent,
+    required super.accentLight,
+    required super.border,
+    required super.warm,
+    required super.gold,
+    required super.shadow,
     required this.userBubble,
     required this.xiaBubble,
     required this.isDark,
-  });
+  }) : super();
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// 月下窗底部装饰：小猫小狗花草线稿
-/// 从 windowsill_page.dart 的 _DecoPainter 抽取
-class FloatingDecor extends StatelessWidget {
+/// 月下窗底部装饰：小猫小狗花草线稿（带动画）
+/// 轻微上下浮动 + 呼吸感
+class FloatingDecor extends StatefulWidget {
   final Color borderColor;
   final Color fillColor;
   final Color fillLightColor;
@@ -19,16 +19,52 @@ class FloatingDecor extends StatelessWidget {
   });
 
   @override
+  State<FloatingDecor> createState() => _FloatingDecorState();
+}
+
+class _FloatingDecorState extends State<FloatingDecor>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _floatAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat(reverse: true);
+    _floatAnim = Tween<double>(begin: -2.0, end: 2.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      child: CustomPaint(
-        painter: _DecoPainter(
-          borderColor: borderColor,
-          fillColor: fillColor,
-          fillLightColor: fillLightColor,
-          blushColor: blushColor,
+    return AnimatedBuilder(
+      animation: _floatAnim,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _floatAnim.value),
+          child: child,
+        );
+      },
+      child: SizedBox(
+        height: widget.height,
+        width: double.infinity,
+        child: CustomPaint(
+          painter: _DecoPainter(
+            borderColor: widget.borderColor,
+            fillColor: widget.fillColor,
+            fillLightColor: widget.fillLightColor,
+            blushColor: widget.blushColor,
+          ),
         ),
       ),
     );
