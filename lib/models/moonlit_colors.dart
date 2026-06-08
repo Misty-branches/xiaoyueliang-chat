@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// 月下窗配色常量（日间灰米 / 夜间亮蓝）
-/// 供所有月下窗页面统一引用，避免重复定义
 class MoonlitColors {
   MoonlitColors._();
 
-  // ---- 日间 ----
+  // 日间
   static const lightBg = Color(0xFFE4E0DA);
   static const lightSurface = Color(0xFFECE9E3);
   static const lightPaper = Color(0xFFF2EFEA);
@@ -18,7 +16,7 @@ class MoonlitColors {
   static const lightGold = Color(0xFFD4B86A);
   static const lightShadow = Color(0x0F2C3745);
 
-  // ---- 夜间 ----
+  // 夜间
   static const darkBg = Color(0xFF162B42);
   static const darkSurface = Color(0xFF1E3550);
   static const darkPaper = Color(0xFF26405A);
@@ -31,52 +29,31 @@ class MoonlitColors {
   static const darkGold = Color(0xFFF5D88A);
   static const darkShadow = Color(0x332C3745);
 
-  /// 根据当前昼夜模式返回一组颜色值
   static MoonlitTheme forMode(bool isDark) => isDark ? _dark : _light;
 
   static const _light = MoonlitTheme(
     bg: lightBg, surface: lightSurface, paper: lightPaper,
     ink: lightInk, inkSec: lightInkSec, accent: lightAccent,
     accentLight: lightAccentLight, border: lightBorder,
-    warm: lightWarm, gold: lightGold, shadow: lightShadow,
-    isDark: false,
+    warm: lightWarm, gold: lightGold, shadow: lightShadow, isDark: false,
   );
 
   static const _dark = MoonlitTheme(
     bg: darkBg, surface: darkSurface, paper: darkPaper,
     ink: darkInk, inkSec: darkInkSec, accent: darkAccent,
     accentLight: darkAccentLight, border: darkBorder,
-    warm: darkWarm, gold: darkGold, shadow: darkShadow,
-    isDark: true,
+    warm: darkWarm, gold: darkGold, shadow: darkShadow, isDark: true,
   );
 }
 
 class MoonlitTheme {
-  final Color bg;
-  final Color surface;
-  final Color paper;
-  final Color ink;
-  final Color inkSec;
-  final Color accent;
-  final Color accentLight;
-  final Color border;
-  final Color warm;
-  final Color gold;
-  final Color shadow;
+  final Color bg, surface, paper, ink, inkSec, accent, accentLight, border, warm, gold, shadow;
   final bool isDark;
 
   const MoonlitTheme({
-    required this.bg,
-    required this.surface,
-    required this.paper,
-    required this.ink,
-    required this.inkSec,
-    required this.accent,
-    required this.accentLight,
-    required this.border,
-    required this.warm,
-    required this.gold,
-    required this.shadow,
-    required this.isDark,
+    required this.bg, required this.surface, required this.paper,
+    required this.ink, required this.inkSec, required this.accent,
+    required this.accentLight, required this.border, required this.warm,
+    required this.gold, required this.shadow, required this.isDark,
   });
 }
