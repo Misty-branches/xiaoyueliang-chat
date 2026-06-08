@@ -11,7 +11,7 @@ class DiaryDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final entry = ModalRoute.of(context)?.settings.arguments as DiaryEntry?;
     if (entry == null) {
-      return Scaffold(body: Center(child: Text('未找到日记', style: TextStyle(color: c.inkSec))));
+      return Scaffold(body: Center(child: Text('未找到日记')));
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
