@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
-import '../models/moonlit_colors.dart';
+import '../models/unified_theme.dart';
 
 class HubPage extends StatelessWidget {
   const HubPage({super.key});
@@ -9,7 +9,9 @@ class HubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = MoonlitColors.forMode(isDark);
+    final chatProv = context.watch<ChatProvider>();
+    final theme = chatProv.currentUnifiedTheme;
+    final c = theme.forMode(isDark);
 
     return Scaffold(
       backgroundColor: c.bg,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/moonlit_colors.dart';
+import 'package:provider/provider.dart';
+import '../models/unified_theme.dart';
+import '../providers/chat_provider.dart';
 import '../components/floating_decor.dart';
 import '../components/page_dots.dart';
 
@@ -9,7 +11,9 @@ class WindowsillPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = MoonlitColors.forMode(isDark);
+    final chatProv = context.watch<ChatProvider>();
+    final theme = chatProv.currentUnifiedTheme;
+    final c = theme.forMode(isDark);
 
     return Scaffold(
       backgroundColor: c.bg,

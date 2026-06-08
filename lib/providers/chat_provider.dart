@@ -8,6 +8,7 @@ import '../models/settings.dart';
 import '../models/book.dart';
 import '../models/chapter.dart';
 import '../models/theme_scheme.dart';
+import '../models/unified_theme.dart';
 import '../services/api_service.dart';
 import '../services/data_service.dart';
 
@@ -36,6 +37,9 @@ class ChatProvider extends ChangeNotifier {
   bool get cloudConnected => _cloudConnected;
   ThemeScheme get currentScheme => ThemeScheme.fromId(_settings.schemeId);
   int get themeVersion => _themeVersion;
+
+  /// 获取当前统一配色方案
+  UnifiedTheme get currentUnifiedTheme => UnifiedTheme.fromId(_settings.schemeId);
 
   ChatProvider() {
     _apiService = ApiService(baseUrl: _settings.apiUrl, apiKey: _settings.apiKey);
