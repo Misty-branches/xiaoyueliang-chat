@@ -7,7 +7,7 @@ import '../stores/todo_store.dart';
 import '../components/circle_button.dart';
 import '../components/page_dots.dart';
 
-const _initialItems = [
+final _initialItems = [
   TodoItem(title: '写小月亮的日记代码', desc: '把日记+待办预览缝进Flutter里编译成APK', tag: '遐'),
   TodoItem(title: '看《人间草木》第二章', desc: '今天读到「葡萄月令」那篇', tag: '小满'),
   TodoItem(title: '选定倒计时墙的模板', desc: '在网站上找几个好看的样式一起挑', tag: '一起'),

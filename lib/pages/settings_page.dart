@@ -508,3 +508,63 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 2),
                     Text(scheme.description, style: TextStyle(fontSize: 11, color: c.inkSec), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// 头像选择行
+  Widget _buildAvatarRow(UnifiedThemeColors c, bool isDark) {
+    return Row(
+      children: [
+        _buildAvatarOption(
+          label: '用户',
+          base64: _avatarUser,
+          color: c.userBubble,
+          onTap: () async {
+            // TODO: 头像选择
+          },
+        ),
+        const SizedBox(width: 16),
+        _buildAvatarOption(
+          label: '遐',
+          base64: _avatarXia,
+          color: c.xiaBubble,
+          onTap: () async {
+            // TODO: 头像选择
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvatarOption({
+    required String label,
+    required String base64,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: color.withValues(alpha: 0.3),
+            child: Text(
+              label.substring(0, 1),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
