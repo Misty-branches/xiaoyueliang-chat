@@ -361,7 +361,6 @@ class UnifiedTheme {
 class UnifiedThemeColors extends MoonlitTheme {
   final Color userBubble;
   final Color xiaBubble;
-  final bool isDark;
 
   const UnifiedThemeColors({
     required super.bg,
@@ -375,8 +374,8 @@ class UnifiedThemeColors extends MoonlitTheme {
     required super.warm,
     required super.gold,
     required super.shadow,
+    required super.isDark,
     required this.userBubble,
     required this.xiaBubble,
-    required this.isDark,
   }) : super();
 }

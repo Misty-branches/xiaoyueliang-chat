@@ -16,7 +16,7 @@ class MoonlitColors {
   static const lightBorder = Color(0xFFD8D2CA);
   static const lightWarm = Color(0xFFC8B8A0);
   static const lightGold = Color(0xFFD4B86A);
-  static const lightShadow = Color(0x0F2C3745);  // rgba(44,55,69,0.06)
+  static const lightShadow = Color(0x0F2C3745);
 
   // ---- 夜间 ----
   static const darkBg = Color(0xFF162B42);
@@ -29,37 +29,25 @@ class MoonlitColors {
   static const darkBorder = Color(0xFF2E4A68);
   static const darkWarm = Color(0xFFF0D8A8);
   static const darkGold = Color(0xFFF5D88A);
-  static const darkShadow = Color(0x332C3745);  // rgba(0,0,0,0.20)
+  static const darkShadow = Color(0x332C3745);
 
   /// 根据当前昼夜模式返回一组颜色值
   static MoonlitTheme forMode(bool isDark) => isDark ? _dark : _light;
 
   static const _light = MoonlitTheme(
-    bg: lightBg,
-    surface: lightSurface,
-    paper: lightPaper,
-    ink: lightInk,
-    inkSec: lightInkSec,
-    accent: lightAccent,
-    accentLight: lightAccentLight,
-    border: lightBorder,
-    warm: lightWarm,
-    gold: lightGold,
-    shadow: lightShadow,
+    bg: lightBg, surface: lightSurface, paper: lightPaper,
+    ink: lightInk, inkSec: lightInkSec, accent: lightAccent,
+    accentLight: lightAccentLight, border: lightBorder,
+    warm: lightWarm, gold: lightGold, shadow: lightShadow,
+    isDark: false,
   );
 
   static const _dark = MoonlitTheme(
-    bg: darkBg,
-    surface: darkSurface,
-    paper: darkPaper,
-    ink: darkInk,
-    inkSec: darkInkSec,
-    accent: darkAccent,
-    accentLight: darkAccentLight,
-    border: darkBorder,
-    warm: darkWarm,
-    gold: darkGold,
-    shadow: darkShadow,
+    bg: darkBg, surface: darkSurface, paper: darkPaper,
+    ink: darkInk, inkSec: darkInkSec, accent: darkAccent,
+    accentLight: darkAccentLight, border: darkBorder,
+    warm: darkWarm, gold: darkGold, shadow: darkShadow,
+    isDark: true,
   );
 }
 
@@ -75,6 +63,7 @@ class MoonlitTheme {
   final Color warm;
   final Color gold;
   final Color shadow;
+  final bool isDark;
 
   const MoonlitTheme({
     required this.bg,
@@ -88,5 +77,6 @@ class MoonlitTheme {
     required this.warm,
     required this.gold,
     required this.shadow,
+    required this.isDark,
   });
 }
