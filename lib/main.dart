@@ -13,7 +13,7 @@ import 'pages/diary_page.dart';
 import 'pages/diary_detail_page.dart';
 import 'pages/todo_page.dart';
 import 'pages/echo_wall_page.dart';
-import 'models/theme_scheme.dart';
+import 'models/unified_theme.dart';
 import 'stores/diary_store.dart';
 import 'stores/todo_store.dart';
 import 'stores/echo_store.dart';
@@ -47,13 +47,12 @@ class XiayueChatApp extends StatelessWidget {
       builder: (context, _, __) {
         final chatProv = context.read<ChatProvider>();
         final isDark = chatProv.settings.darkMode;
-        final scheme = chatProv.currentScheme;
-        final accentColor = scheme.primaryColorObj;
+        final theme = chatProv.currentUnifiedTheme;
         return MaterialApp(
           title: '遐悦',
           debugShowCheckedModeBanner: false,
-          theme: _buildLightTheme(accentColor, scheme),
-          darkTheme: _buildDarkTheme(accentColor, scheme),
+          theme: _buildLightTheme(theme),
+          darkTheme: _buildDarkTheme(theme),
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
           initialRoute: '/',
           onGenerateRoute: (settings) {
@@ -117,14 +116,14 @@ class XiayueChatApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildLightTheme(Color accent, ThemeScheme scheme) {
+  ThemeData _buildLightTheme(UnifiedTheme theme) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorSchemeSeed: accent,
-      scaffoldBackgroundColor: scheme.bgColorObj,
+      colorSchemeSeed: theme.lightAccent,
+      scaffoldBackgroundColor: theme.lightBg,
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.cardBgColorObj,
+        backgroundColor: theme.lightPaper,
         foregroundColor: Colors.grey.shade800,
         elevation: 0,
         centerTitle: false,
@@ -135,7 +134,7 @@ class XiayueChatApp extends StatelessWidget {
         ),
       ),
       cardTheme: CardThemeData(
-        color: scheme.cardBgColorObj,
+        color: theme.lightPaper,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
@@ -146,14 +145,14 @@ class XiayueChatApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildDarkTheme(Color accent, ThemeScheme scheme) {
+  ThemeData _buildDarkTheme(UnifiedTheme theme) {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorSchemeSeed: accent,
-      scaffoldBackgroundColor: scheme.darkBgColorObj,
+      colorSchemeSeed: theme.darkAccent,
+      scaffoldBackgroundColor: theme.darkBg,
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.darkCardBgColorObj,
+        backgroundColor: theme.darkPaper,
         foregroundColor: Colors.grey.shade200,
         elevation: 0,
         centerTitle: false,
@@ -164,7 +163,7 @@ class XiayueChatApp extends StatelessWidget {
         ),
       ),
       cardTheme: CardThemeData(
-        color: scheme.darkCardBgColorObj,
+        color: theme.darkPaper,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),

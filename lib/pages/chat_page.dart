@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:xiayue_chat/providers/chat_provider.dart';
 import 'package:xiayue_chat/providers/reading_provider.dart';
-import 'package:xiayue_chat/models/theme_scheme.dart';
+
 import '../models/unified_theme.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/input_bar.dart';
@@ -62,7 +62,7 @@ class _ChatPageState extends State<ChatPage> {
     final readingProvider = context.watch<ReadingProvider>();
     final session = chatProvider.currentSession;
     final settings = chatProvider.settings;
-    final scheme = chatProvider.currentScheme;
+
     final topInset = MediaQuery.of(context).padding.top;
 
     return Scaffold(
@@ -101,7 +101,7 @@ class _ChatPageState extends State<ChatPage> {
                       // 消息列表
                       Expanded(
                         child: session == null || session.messages.isEmpty
-                            ? _buildEmptyState(isDark, c, readingProvider, scheme)
+                            ? _buildEmptyState(isDark, c, readingProvider)
                             : ListView.builder(
                                 controller: _scrollController,
                                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -124,9 +124,9 @@ class _ChatPageState extends State<ChatPage> {
                                     message: msg,
                                     avatarUser: settings.avatarUser,
                                     avatarXia: settings.avatarXia,
-                                    userBubbleColor: scheme.userBubbleColorObj,
-                                    xiaBubbleColor: scheme.xiaBubbleColorObj,
-                                    primaryColor: scheme.primaryColorObj,
+                                    userBubbleColor: c.userBubble,
+                                    xiaBubbleColor: c.xiaBubble,
+                                    primaryColor: c.accent,
                                     onDelete: () => chatProvider.deleteMessage(index),
                                     onRegenerate: () {
                                       if (index > 0 && session.messages.length > index) {
@@ -163,6 +163,7 @@ class _ChatPageState extends State<ChatPage> {
                         onSend: _handleSend,
                         onCancel: () => chatProvider.cancelStreaming(),
                         onClearReference: () => chatProvider.clearReferenceBook(),
+                        theme: c,
                       ),
                     ],
                   ),
@@ -174,7 +175,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
 
       // ===== 会话抽屉（保留） =====
-      drawer: _buildSessionDrawer(context, isDark, c, chatProvider, scheme),
+      drawer: _buildSessionDrawer(context, isDark, c, chatProvider),
     );
   }
 
@@ -322,7 +323,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // ===== 空状态 =====
-  Widget _buildEmptyState(bool isDark, MoonlitTheme c, ReadingProvider readingProvider, ThemeScheme scheme) {
+  Widget _buildEmptyState(bool isDark, MoonlitTheme c, ReadingProvider readingProvider) {
     if (readingProvider.isReading && readingProvider.currentChapter != null) {
       final ch = readingProvider.currentChapter!;
       return SingleChildScrollView(
@@ -389,7 +390,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // ===== 会话抽屉 =====
-  Widget _buildSessionDrawer(BuildContext context, bool isDark, MoonlitTheme c, ChatProvider provider, ThemeScheme scheme) {
+  Widget _buildSessionDrawer(BuildContext context, bool isDark, MoonlitTheme c, ChatProvider provider) {
     return Drawer(
       backgroundColor: c.paper,
       child: SafeArea(

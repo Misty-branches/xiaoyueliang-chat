@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import '../models/settings.dart';
-import '../models/theme_scheme.dart';
+
 import '../models/unified_theme.dart';
 import '../providers/chat_provider.dart';
 
@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
   late int _accentColor;
   String _avatarUser = '';
   String _avatarXia = '';
-  String _schemeId = 'peach-blossom';
+
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _accentColor = settings.accentColor;
     _avatarUser = settings.avatarUser;
     _avatarXia = settings.avatarXia;
-    _schemeId = settings.schemeId;
+
   }
 
   @override
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
       accentColor: _accentColor,
       avatarUser: _avatarUser,
       avatarXia: _avatarXia,
-      schemeId: _schemeId,
+
     ));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -88,10 +88,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final chatProv = context.watch<ChatProvider>();
     final theme = chatProv.currentUnifiedTheme;
     final c = theme.forMode(isDark);
-    final cs = Theme.of(context).colorScheme;
     final provider = context.watch<ChatProvider>();
     final settings = provider.settings;
-    final scheme = provider.currentScheme;
+
 
     return Scaffold(
       backgroundColor: c.bg,
@@ -220,29 +219,10 @@ class _SettingsPageState extends State<SettingsPage> {
             isDark,
             '主题装扮',
             [
-              // 配色方案选择
-              _buildSchemeSelector(isDark, cs),
-              const SizedBox(height: 16),
               // 头像
               Text('头像', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: c.inkSec)),
               const SizedBox(height: 10),
               _buildAvatarRow(c, isDark),
-              const SizedBox(height: 16),
-              // 深色模式
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  '深色模式',
-                  style: TextStyle(
-                    color: c.ink,
-                  ),
-                ),
-                value: settings.darkMode,
-                onChanged: (v) {
-                  provider.updateSettings(settings.copyWith(darkMode: v));
-                },
-                activeColor: c.accent,
-              ),
             ],
           ),
           const SizedBox(height: 32),
@@ -447,71 +427,6 @@ class _SettingsPageState extends State<SettingsPage> {
           activeColor: c.accent,
           inactiveColor: c.border,
           onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-
-  /// 配色方案选择器 — 卡片式，每行两个
-  Widget _buildSchemeSelector(bool isDark, ColorScheme cs) {
-    final chatProv = context.watch<ChatProvider>();
-    final theme = chatProv.currentUnifiedTheme;
-    final c = theme.forMode(isDark);
-    final schemes = ThemeScheme.presets;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('配色方案', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: c.inkSec)),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: schemes.map((scheme) {
-            final isSelected = _schemeId == scheme.id;
-            final userColor = scheme.userBubbleColorObj;
-            final xiaColor = scheme.xiaBubbleColorObj;
-            final primaryColor = scheme.primaryColorObj;
-            return GestureDetector(
-              onTap: () => setState(() => _schemeId = scheme.id),
-              child: Container(
-                width: (MediaQuery.of(context).size.width - 52) / 2 - 5,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: c.paper,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? primaryColor : c.border,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 颜色预览 — 三个小圆点
-                    Row(
-                      children: [
-                        Container(width: 16, height: 16, decoration: BoxDecoration(color: userColor, shape: BoxShape.circle, border: Border.all(color: c.border, width: 0.5))),
-                        const SizedBox(width: 6),
-                        Container(width: 16, height: 16, decoration: BoxDecoration(color: xiaColor, shape: BoxShape.circle, border: Border.all(color: c.border, width: 0.5))),
-                        const SizedBox(width: 6),
-                        Container(width: 16, height: 16, decoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // 方案名称 + 选中标记
-                    Row(
-                      children: [
-                        Expanded(child: Text(scheme.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: c.ink), overflow: TextOverflow.ellipsis)),
-                        if (isSelected) Icon(Icons.check_circle, size: 16, color: primaryColor),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(scheme.description, style: TextStyle(fontSize: 11, color: c.inkSec), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
         ),
       ],
     );

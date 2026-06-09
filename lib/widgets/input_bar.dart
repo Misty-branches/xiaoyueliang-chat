@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/book.dart';
-import '../models/moonlit_colors.dart';
+import '../models/unified_theme.dart';
 
 class InputBar extends StatefulWidget {
   final Function(String) onSend;
@@ -8,6 +8,7 @@ class InputBar extends StatefulWidget {
   final VoidCallback? onCancel;
   final Book? referencedBook;
   final VoidCallback? onClearReference;
+  final MoonlitTheme? theme;
 
   const InputBar({
     super.key,
@@ -16,6 +17,7 @@ class InputBar extends StatefulWidget {
     this.onCancel,
     this.referencedBook,
     this.onClearReference,
+    this.theme,
   });
 
   @override
@@ -52,8 +54,7 @@ class _InputBarState extends State<InputBar> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = MoonlitColors.forMode(isDark);
+    final c = widget.theme ?? UnifiedTheme.moonlit.forMode(Theme.of(context).brightness == Brightness.dark);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(

@@ -1,6 +1,4 @@
 import 'package:flutter/painting.dart';
-import 'theme_scheme.dart';
-
 class AppSettings {
   final String apiUrl;
   final String apiKey;
@@ -24,10 +22,10 @@ class AppSettings {
     this.darkMode = false,
     this.systemPrompt = '你是遐，一个温柔、知性、善解人意的AI助手。你的用户是小满，请用温暖亲切的语气与他交流。',
     this.dataServiceUrl = '',
-    this.accentColor = 0xFFEC407A,
+    this.accentColor = 0xFF5A7A94,
     this.avatarUser = '',
     this.avatarXia = '',
-    this.schemeId = 'peach-blossom',
+    this.schemeId = 'moonlit',
   });
 
   Color get accentColorObj => Color(accentColor);
@@ -87,9 +85,9 @@ class AppSettings {
         systemPrompt: json['systemPrompt'] as String? ??
             '你是遐，一个温柔、知性、善解人意的AI助手。你的用户是小满，请用温暖亲切的语气与他交流。',
         dataServiceUrl: json['dataServiceUrl'] as String? ?? '',
-        accentColor: json['accentColor'] as int? ?? 0xFFEC407A,
+        accentColor: json['accentColor'] as int? ?? 0xFF5A7A94,
         avatarUser: json['avatarUser'] as String? ?? '',
         avatarXia: json['avatarXia'] as String? ?? '',
-        schemeId: json['schemeId'] as String? ?? 'peach-blossom',
+        schemeId: json['schemeId'] as String? ?? 'moonlit',
       );
 }

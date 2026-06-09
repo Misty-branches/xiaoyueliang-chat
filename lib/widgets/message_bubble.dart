@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/message.dart';
-import '../models/moonlit_colors.dart';
+import '../models/unified_theme.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
@@ -32,9 +32,9 @@ class MessageBubble extends StatelessWidget {
     this.onShare,
     this.avatarUser = '',
     this.avatarXia = '',
-    this.userBubbleColor = const Color(0xFFF8BBD0),
-    this.xiaBubbleColor = const Color(0xFFFCE4EC),
-    this.primaryColor = const Color(0xFFEC407A),
+    this.userBubbleColor = const Color(0xFFD8E2EC),
+    this.xiaBubbleColor = const Color(0xFFECE9E3),
+    this.primaryColor = const Color(0xFF5A7A94),
   });
 
   @override
