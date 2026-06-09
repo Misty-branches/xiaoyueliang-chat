@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+
 class AppSettings {
   final String apiUrl;
   final String apiKey;
@@ -8,9 +9,7 @@ class AppSettings {
   final bool darkMode;
   final String systemPrompt;
   final String dataServiceUrl;
-  final int accentColor; // 主题色 hex 值（如 0xFFEC407A）
-  final String avatarUser; // 用户头像 base64
-  final String avatarXia; // 遐头像 base64
+  final int accentColor; // 主题色 hex 值（如 0xFF5A7A94）
   final String schemeId; // 当前配色方案 ID
 
   const AppSettings({
@@ -23,8 +22,6 @@ class AppSettings {
     this.systemPrompt = '你是遐，一个温柔、知性、善解人意的AI助手。你的用户是小满，请用温暖亲切的语气与他交流。',
     this.dataServiceUrl = '',
     this.accentColor = 0xFF5A7A94,
-    this.avatarUser = '',
-    this.avatarXia = '',
     this.schemeId = 'moonlit',
   });
 
@@ -40,8 +37,6 @@ class AppSettings {
     String? systemPrompt,
     String? dataServiceUrl,
     int? accentColor,
-    String? avatarUser,
-    String? avatarXia,
     String? schemeId,
   }) {
     return AppSettings(
@@ -54,8 +49,6 @@ class AppSettings {
       systemPrompt: systemPrompt ?? this.systemPrompt,
       dataServiceUrl: dataServiceUrl ?? this.dataServiceUrl,
       accentColor: accentColor ?? this.accentColor,
-      avatarUser: avatarUser ?? this.avatarUser,
-      avatarXia: avatarXia ?? this.avatarXia,
       schemeId: schemeId ?? this.schemeId,
     );
   }
@@ -70,8 +63,6 @@ class AppSettings {
         'systemPrompt': systemPrompt,
         'dataServiceUrl': dataServiceUrl,
         'accentColor': accentColor,
-        'avatarUser': avatarUser,
-        'avatarXia': avatarXia,
         'schemeId': schemeId,
       };
 
@@ -86,8 +77,6 @@ class AppSettings {
             '你是遐，一个温柔、知性、善解人意的AI助手。你的用户是小满，请用温暖亲切的语气与他交流。',
         dataServiceUrl: json['dataServiceUrl'] as String? ?? '',
         accentColor: json['accentColor'] as int? ?? 0xFF5A7A94,
-        avatarUser: json['avatarUser'] as String? ?? '',
-        avatarXia: json['avatarXia'] as String? ?? '',
         schemeId: json['schemeId'] as String? ?? 'moonlit',
       );
 }

@@ -25,8 +25,6 @@ class _SettingsPageState extends State<SettingsPage> {
   late double _temperature;
   late int _maxTokens;
   late int _accentColor;
-  String _avatarUser = '';
-  String _avatarXia = '';
 
 
   @override
@@ -41,8 +39,6 @@ class _SettingsPageState extends State<SettingsPage> {
     _temperature = settings.temperature;
     _maxTokens = settings.maxTokens;
     _accentColor = settings.accentColor;
-    _avatarUser = settings.avatarUser;
-    _avatarXia = settings.avatarXia;
 
   }
 
@@ -68,8 +64,6 @@ class _SettingsPageState extends State<SettingsPage> {
       systemPrompt: _systemPromptController.text.trim(),
       dataServiceUrl: _dataServiceUrlController.text.trim(),
       accentColor: _accentColor,
-      avatarUser: _avatarUser,
-      avatarXia: _avatarXia,
 
     ));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -215,16 +209,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildSection(
-            isDark,
-            '主题装扮',
-            [
-              // 头像
-              Text('头像', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: c.inkSec)),
-              const SizedBox(height: 10),
-              _buildAvatarRow(c, isDark),
-            ],
-          ),
           const SizedBox(height: 32),
           // Test connection button
           SizedBox(
@@ -432,54 +416,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// 头像选择行
-  Widget _buildAvatarRow(UnifiedThemeColors c, bool isDark) {
-    return Row(
-      children: [
-        _buildAvatarOption(
-          label: '用户',
-          base64: _avatarUser,
-          color: c.userBubble,
-          onTap: () async {
-            // TODO: 头像选择
-          },
-        ),
-        const SizedBox(width: 16),
-        _buildAvatarOption(
-          label: '遐',
-          base64: _avatarXia,
-          color: c.xiaBubble,
-          onTap: () async {
-            // TODO: 头像选择
-          },
-        ),
-      ],
-    );
-  }
 
-  Widget _buildAvatarOption({
-    required String label,
-    required String base64,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: color.withValues(alpha: 0.3),
-            child: Text(
-              label.substring(0, 1),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(fontSize: 12)),
-        ],
-      ),
-    );
-  }
 }
 

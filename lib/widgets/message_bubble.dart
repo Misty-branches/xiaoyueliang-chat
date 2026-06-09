@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -14,8 +14,6 @@ class MessageBubble extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onFavorite;
   final VoidCallback? onShare;
-  final String avatarUser;
-  final String avatarXia;
   final Color userBubbleColor;
   final Color xiaBubbleColor;
   final Color primaryColor;
@@ -30,8 +28,6 @@ class MessageBubble extends StatelessWidget {
     this.onEdit,
     this.onFavorite,
     this.onShare,
-    this.avatarUser = '',
-    this.avatarXia = '',
     this.userBubbleColor = const Color(0xFFD8E2EC),
     this.xiaBubbleColor = const Color(0xFFECE9E3),
     this.primaryColor = const Color(0xFF5A7A94),
@@ -93,17 +89,6 @@ class MessageBubble extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: _buildAvatar(
-            base64Str: avatarUser,
-            fallbackText: '满',
-            bgColor: primaryColor.withValues(alpha: 0.3),
-            textColor: primaryColor,
-            isDark: isDark,
-          ),
-        ),
       ],
     );
   }
@@ -115,17 +100,6 @@ class MessageBubble extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 2),
-          child: _buildAvatar(
-            base64Str: avatarXia,
-            fallbackText: '遐',
-            bgColor: primaryColor.withValues(alpha: 0.3),
-            textColor: primaryColor,
-            isDark: isDark,
-          ),
-        ),
-        const SizedBox(width: 8),
         Flexible(
           child: Container(
             constraints: BoxConstraints(maxWidth: maxWidth),
@@ -173,38 +147,6 @@ class MessageBubble extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  /// 头像组件：有 base64 就显示图片，否则文字
-  Widget _buildAvatar({
-    required String base64Str,
-    required String fallbackText,
-    required Color bgColor,
-    required Color textColor,
-    required bool isDark,
-  }) {
-    if (base64Str.isNotEmpty) {
-      try {
-        return CircleAvatar(
-          radius: 16,
-          backgroundImage: MemoryImage(base64Decode(base64Str)),
-        );
-      } catch (_) {
-        // base64 解析失败，降级到文字
-      }
-    }
-    return CircleAvatar(
-      radius: 16,
-      backgroundColor: bgColor,
-      child: Text(
-        fallbackText,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
-      ),
     );
   }
 

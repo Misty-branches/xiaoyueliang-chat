@@ -122,8 +122,6 @@ class _ChatPageState extends State<ChatPage> {
 
                                   widgets.add(MessageBubble(
                                     message: msg,
-                                    avatarUser: settings.avatarUser,
-                                    avatarXia: settings.avatarXia,
                                     userBubbleColor: c.userBubble,
                                     xiaBubbleColor: c.xiaBubble,
                                     primaryColor: c.accent,
