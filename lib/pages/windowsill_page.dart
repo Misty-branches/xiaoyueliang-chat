@@ -53,13 +53,13 @@ class WindowsillPage extends StatelessWidget {
                           Center(
                             child: _WindowCross(border: c.border),
                           ),
-                          // 月亮（放大，带光晕）
+                          // 月亮（带光晕）
                           Positioned(
-                            top: 12,
-                            right: 10,
+                            top: 16,
+                            right: 14,
                             child: Container(
-                              width: 32,
-                              height: 32,
+                              width: 28,
+                              height: 28,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: c.gold,
@@ -383,10 +383,10 @@ class _CrossPainter extends CustomPainter {
       Offset(size.width / 2, size.height),
       paint,
     );
-    // 水平线（偏上，约40%位置，更有窗户感）
+    // 水平线（居中，田字格均匀）
     canvas.drawLine(
-      Offset(0, size.height * 0.4),
-      Offset(size.width, size.height * 0.4),
+      Offset(0, size.height / 2),
+      Offset(size.width, size.height / 2),
       paint,
     );
   }
