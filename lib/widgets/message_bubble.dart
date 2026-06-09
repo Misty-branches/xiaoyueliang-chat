@@ -280,7 +280,7 @@ class MessageBubble extends StatelessWidget {
   }
 
   void _showMessageMenu(BuildContext context, bool isDark) {
-    final c = MoonlitColors.forMode(isDark);
+    final c = UnifiedTheme.moonlit.forMode(isDark);
     final bgColor = c.surface;
     final cardColor = c.paper;
     final textColor = c.ink;
