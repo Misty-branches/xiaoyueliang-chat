@@ -242,63 +242,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // ===== 聊天卡片顶部的头像 + 状态 =====
-  Widget _buildChatProfile(MoonlitTheme c) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-      child: Row(
-        children: [
-          // 弯月头像
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: c.accentLight,
-              border: Border.all(color: c.border, width: 1),
-            ),
-            child: Icon(Icons.circle_rounded, size: 22, color: c.gold),
-          ),
-          const SizedBox(width: 10),
-          // 名称 + 状态
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '小月亮·月下窗',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: c.ink,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '在线·月光正好',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: c.inkSec,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 右侧弯月图标
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: c.border, width: 1),
-              color: c.surface,
-            ),
-            child: Icon(Icons.circle_rounded, size: 16, color: c.gold),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // ===== 日期分割线 =====
   Widget _buildDateDivider(String text, MoonlitTheme c) {

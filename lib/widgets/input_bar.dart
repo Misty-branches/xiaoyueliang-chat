@@ -98,7 +98,7 @@ class _InputBarState extends State<InputBar> {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: c.paper,
+                      fillColor: c.surface,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     ),
                   ),
@@ -108,10 +108,10 @@ class _InputBarState extends State<InputBar> {
                   GestureDetector(
                     onTap: widget.onCancel,
                     child: Container(
-                      width: 40, height: 40,
+                      width: 36, height: 36,
                       decoration: BoxDecoration(
                         color: c.warm,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: const Icon(Icons.stop_rounded, color: Colors.white, size: 20),
                     ),
@@ -120,12 +120,12 @@ class _InputBarState extends State<InputBar> {
                   GestureDetector(
                     onTap: _hasText ? _handleSend : null,
                     child: Container(
-                      width: 40, height: 40,
+                      width: 36, height: 36,
                       decoration: BoxDecoration(
                         color: _hasText
                             ? c.accent
-                            : c.border,
-                        borderRadius: BorderRadius.circular(20),
+                            : c.surface,
+                        borderRadius: BorderRadius.circular(18),
                       ),
                       child: Icon(
                         Icons.arrow_upward_rounded,
